@@ -1,0 +1,34 @@
+/* ============================================================================
+   plasma-wave.css — Estilos del componente PlasmaWave (react-bits)
+   ----------------------------------------------------------------------------
+   Vendido del PlasmaWave.css original (reactbits.dev), más la clase de
+   reserva --sin-webgl: cuando no hay WebGL2 (o React no cargó y
+   js/animaciones.js montó el respaldo .fondo-plasma--estatico) se muestra
+   un degradado estático con los mismos violeta y cian de la onda.
+   El posicionamiento del ancla #fondo-portada vive en css/animaciones.css.
+   ========================================================================== */
+
+.plasma-wave-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.plasma-wave-canvas {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* Reserva sin WebGL2 (y respaldo sin React): niebla violeta/cian quieta */
+.plasma-wave-container--sin-webgl,
+.fondo-plasma--estatico {
+  background:
+    radial-gradient(60% 90% at 30% 62%, rgba(168, 85, 247, 0.30), transparent 70%),
+    radial-gradient(55% 85% at 70% 55%, rgba(6, 182, 212, 0.24), transparent 70%),
+    radial-gradient(40% 60% at 50% 50%, rgba(168, 85, 247, 0.10), transparent 75%),
+    #120f17;
+}

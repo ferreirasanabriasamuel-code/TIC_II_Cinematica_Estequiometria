@@ -1,0 +1,394 @@
+/* ============================================================================
+   base.css — Fundaciones compartidas por TODAS las páginas del sitio
+   ----------------------------------------------------------------------------
+   ESTILO VISUAL: editorial minimalista (revista digital / app de hábitos)
+     · Alto contraste, mucho espacio en blanco, jerarquía tipográfica fuerte
+     · Títulos en serif editorial (Playfair Display), cuerpo en sans (Inter)
+     · Microcopy (etiquetas, pasos, botones) en MAYÚSCULAS con espaciado amplio
+     · Formas orgánicas (blobs con degradado) combinadas con un patrón
+       geométrico de puntos: son los únicos elementos decorativos
+     · Sensación calmada y "paso a paso" (stepper / onboarding)
+
+   Contiene:
+     1. Fuentes incluidas en el proyecto (para que funcione sin conexión)
+     2. Variables de diseño en :root (colores, degradados, radios, espaciados,
+        sombras y transiciones: todo se ajusta desde este único lugar)
+     3. Reset mínimo y tipografía base
+     4. Accesibilidad: foco visible y respeto por prefers-reduced-motion
+     5. Temas: exponen el acento de Cinemática o de Estequiometría
+     6. Componentes compartidos: microcopy, blob, puntos, botón primario, toast
+     7. Animaciones y utilidades
+   ========================================================================== */
+
+
+/* ============================ 1. Fuentes locales ========================= */
+/* Archivos descargados de Google Fonts (licencia OFL, ver fonts/).          */
+/* Si algún archivo faltara, el navegador usa sin problemas las fuentes de   */
+/* respaldo declaradas en --fuente-titulos / --fuente-texto.                 */
+
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('../fonts/inter-400.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('../fonts/inter-500.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('../fonts/inter-600.woff2') format('woff2');
+}
+
+/* Serif editorial para los títulos (estilo revista) */
+@font-face {
+  font-family: 'Playfair Display';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('../fonts/playfair-display-500.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Playfair Display';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('../fonts/playfair-display-700.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Playfair Display';
+  font-style: normal;
+  font-weight: 800;
+  font-display: swap;
+  src: url('../fonts/playfair-display-800.woff2') format('woff2');
+}
+
+
+/* ========================= 2. Variables de diseño ======================== */
+
+:root {
+  /* --- Colores de base (papel editorial) --- */
+  --color-fondo: #ffffff;
+  --color-crema: #faf8f4;          /* tinte cálido para tarjetas y bloques   */
+  --color-texto: #26232e;          /* tinta casi negra: texto fuerte neutro  */
+  --color-texto-suave: #6f6a7a;    /* gris atenuado: texto secundario        */
+  --color-borde: #eae7e1;          /* filetes y divisores finos              */
+  --color-borde-fuerte: #d7d2c8;   /* contornos de casillas y controles      */
+
+  /* --- Colores de retroalimentación (juegos) --- */
+  --color-exito: #047857;
+  --color-exito-fondo: #ecfdf5;
+  --color-error: #b91c1c;
+  --color-error-fondo: #fef2f2;
+
+  /* --- Acento de Cinemática (celeste-cian) --- */
+  --cine-intenso-1: #075985;       /* azul profundo: botones, texto fuerte   */
+  --cine-intenso-2: #0891b2;       /* cian: extremo claro del degradado      */
+  --cine-tinta: #075985;           /* texto legible sobre fondos suaves      */
+  --cine-tinte: #eef7fb;           /* fondo de fórmulas, chips y avisos      */
+  --cine-texto-suave: #47627a;     /* gris azulado atenuado (texto secund.)  */
+  --cine-punto: rgba(8, 145, 178, 0.30);   /* color del patrón de puntos     */
+
+  /* --- Acento de Estequiometría (violeta) --- */
+  --este-intenso-1: #5b21b6;       /* violeta profundo: botones, texto fuerte */
+  --este-intenso-2: #7c3aed;       /* violeta: extremo claro del degradado    */
+  --este-tinta: #4c1d95;
+  --este-tinte: #f4f0ff;
+  --este-texto-suave: #5e5480;     /* gris violáceo atenuado (texto secund.)  */
+  --este-punto: rgba(124, 58, 237, 0.26);
+
+  /* --- Degradados --- */
+  /* Blobs orgánicos: degradado diagonal primario → secundario */
+  --degradado-blob-cine: linear-gradient(135deg, var(--cine-intenso-1) 0%, var(--cine-intenso-2) 100%);
+  --degradado-blob-este: linear-gradient(135deg, var(--este-intenso-1) 0%, var(--este-intenso-2) 100%);
+  /* Línea central: de cian a violeta, uniendo los dos temas */
+  --degradado-linea: linear-gradient(180deg, var(--cine-intenso-2) 0%, var(--este-intenso-1) 100%);
+
+  /* --- Tipografía (con respaldo a fuentes del sistema) --- */
+  --fuente-titulos: 'Playfair Display', Georgia, 'Times New Roman', serif;
+  --fuente-texto: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+
+  /* --- Radios --- */
+  --radio-chico: 10px;
+  --radio-medio: 16px;
+  --radio-grande: 24px;            /* tarjetas: esquinas muy redondeadas     */
+  --radio-boton: 14px;             /* botón CTA: rectángulo redondeado       */
+  --radio-pill: 999px;
+
+  /* --- Espaciados (escala) --- */
+  --espacio-1: 0.25rem;
+  --espacio-2: 0.5rem;
+  --espacio-3: 1rem;
+  --espacio-4: 1.5rem;
+  --espacio-5: 2.5rem;
+  --espacio-6: 4rem;
+
+  /* --- Margen lateral de página (generoso: 24-40px) --- */
+  --margen-x: clamp(1.5rem, 5vw, 2.5rem);
+
+  /* --- Transiciones y animaciones (premium: curva exponencial-out) --- */
+  /* --curva: curva de desaceleración suave para TODAS las transiciones.  */
+  --duracion: 0.4s;                /* base de micro-interacciones          */
+  --duracion-lenta: 0.6s;          /* entradas grandes (reveal, paneles)   */
+  --curva: cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* --- Sombras (suaves y difusas, nada exagerado) --- */
+  --sombra-suave: 0 2px 6px rgba(38, 35, 46, 0.05), 0 18px 44px rgba(38, 35, 46, 0.08);
+  --sombra-panel: 0 0 0 1px rgba(38, 35, 46, 0.05), 0 32px 80px rgba(38, 35, 46, 0.18);
+
+  /* --- Capas --- */
+  --z-linea: 2;    /* línea central sobre las mitades */
+  --z-panel: 10;   /* panel por encima de todo        */
+
+  /* --- Color del anillo de foco (cada tema lo redefine) --- */
+  --color-foco: #26232e;
+}
+
+
+/* ====================== 3. Reset y tipografía base ====================== */
+
+*,
+*::before,
+*::after { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  margin: 0;
+  background: var(--color-fondo);
+  color: var(--color-texto);
+  font-family: var(--fuente-texto);
+  font-size: 0.875rem;             /* cuerpo de texto pequeño (~14px) */
+  line-height: 1.75;               /* interlineado amplio             */
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Títulos: serif editorial bold, interlineado ajustado */
+h1, h2, h3, h4 {
+  font-family: var(--fuente-titulos);
+  font-weight: 700;
+  line-height: 1.12;
+  letter-spacing: -0.01em;
+  margin: 0;
+}
+
+p { margin: 0 0 var(--espacio-3); }
+p:last-child { margin-bottom: 0; }
+
+img { max-width: 100%; display: block; }
+
+button { font: inherit; cursor: pointer; }
+
+a { color: inherit; }
+
+code {
+  font-family: ui-monospace, 'SF Mono', 'Cascadia Code', Consolas, monospace;
+  font-size: 0.9em;
+  background: var(--color-crema);
+  border: 1px solid var(--color-borde);
+  padding: 0.05em 0.4em;
+  border-radius: 6px;
+}
+
+
+/* ============================ 4. Accesibilidad =========================== */
+
+/* Anillo de foco visible solo cuando se navega con teclado */
+:focus-visible {
+  outline: 3px solid var(--color-foco);
+  outline-offset: 3px;
+  border-radius: var(--radio-chico);
+}
+
+
+/* ========================== 5. Temas (acentos) =========================== */
+/* Clases de tema: exponen el acento correspondiente a los componentes.
+   Se aplican a los paneles, a las mitades de la portada y al <body> de
+   las páginas de juego. También definen el degradado de los blobs y el
+   color del patrón de puntos de ese tema.                                  */
+
+.tema-cinematica {
+  --acento: var(--cine-intenso-2);
+  --acento-oscuro: var(--cine-intenso-1);
+  --tinte: var(--cine-tinte);
+  --texto-suave-tema: var(--cine-texto-suave);
+  --degradado-blob: var(--degradado-blob-cine);
+  --punto: var(--cine-punto);
+  --color-foco: var(--cine-intenso-1);
+}
+
+.tema-estequiometria {
+  --acento: var(--este-intenso-2);
+  --acento-oscuro: var(--este-intenso-1);
+  --tinte: var(--este-tinte);
+  --texto-suave-tema: var(--este-texto-suave);
+  --degradado-blob: var(--degradado-blob-este);
+  --punto: var(--este-punto);
+  --color-foco: var(--este-intenso-1);
+}
+
+
+/* ==================== 6. Componentes compartidos ========================= */
+
+/* --- Microcopy: etiquetas, indicadores de paso y botones ----------------- */
+/* Sans-serif en MAYÚSCULAS, letter-spacing amplio, tamaño muy pequeño.     */
+
+.micro {
+  margin: 0;
+  font-family: var(--fuente-texto);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+
+/* --- Blob orgánico ------------------------------------------------------- */
+/* Mancha de bordes redondeados asimétricos, con degradado diagonal del     */
+/* tema. Se coloca en una esquina (posiciona el contenedor). Se deforma     */
+/* muy lentamente para dar sensación calmada (se desactiva con              */
+/* prefers-reduced-motion).                                                 */
+
+.blob {
+  position: absolute;
+  aspect-ratio: 1 / 1;
+  border-radius: 62% 38% 46% 54% / 64% 48% 52% 36%;
+  background: var(--degradado-blob, var(--color-texto));
+  animation: blob-morfear 16s ease-in-out infinite alternate;
+}
+
+@keyframes blob-morfear {
+  from { border-radius: 62% 38% 46% 54% / 64% 48% 52% 36%; }
+  50%  { border-radius: 45% 55% 62% 38% / 38% 62% 44% 56%; }
+  to   { border-radius: 55% 45% 38% 62% / 56% 40% 60% 40%; }
+}
+
+
+/* --- Patrón de puntos (halftone / grid) ---------------------------------- */
+/* Textura de puntos pequeños y regulares, en opacidad baja. Se usa como    */
+/* fondo decorativo detrás o junto al blob.                                 */
+
+.puntos {
+  position: absolute;
+  background-image: radial-gradient(var(--punto, rgba(38, 35, 46, 0.25)) 1.3px, transparent 1.4px);
+  background-size: 15px 15px;
+}
+
+
+/* --- Botón primario (CTA) ------------------------------------------------ */
+/* Rectángulo redondeado sólido en el color del tema, texto corto en        */
+/* mayúsculas.                                                              */
+
+.boton-primario {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6em;
+  min-height: 3.25rem;
+  padding: 0.85rem 2.1rem;
+  border: none;
+  border-radius: var(--radio-boton);
+  background: var(--acento-oscuro, var(--color-texto));
+  color: #ffffff;
+  font-family: var(--fuente-texto);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition:
+    transform var(--duracion) var(--curva),
+    box-shadow var(--duracion) var(--curva),
+    filter var(--duracion) var(--curva);
+}
+
+@media (hover: hover) {
+  .boton-primario:hover {
+    transform: translateY(-2px) scale(1.03);
+    box-shadow: var(--sombra-suave);
+    filter: brightness(1.08);
+  }
+}
+
+.boton-primario:focus-visible {
+  outline-color: var(--acento-oscuro, var(--color-texto));
+}
+
+.boton-primario:disabled {
+  background: var(--color-borde);
+  color: var(--color-texto-suave);
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+  filter: none;
+}
+
+
+/* --- Toast (aviso breve, p. ej. al guardar la posición) ------------------ */
+
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: 1.5rem;
+  transform: translate(-50%, 0.75rem);
+  z-index: 50;
+  margin: 0;
+  padding: 0.7rem 1.3rem;
+  border-radius: var(--radio-pill);
+  background: var(--color-texto);
+  color: #ffffff;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  box-shadow: var(--sombra-suave);
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    opacity var(--duracion) var(--curva),
+    transform var(--duracion) var(--curva);
+}
+
+.toast.visible {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
+
+/* ====================== 7. Animaciones y utilidades ====================== */
+
+/* Animación compartida: desvanecido + subida suave (0.3s) */
+@keyframes aparecer {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: none; }
+}
+
+.animar-aparicion {
+  animation: aparecer var(--duracion) var(--curva) both;
+}
+
+/* Si el usuario prefiere reducir el movimiento, se desactiva todo
+   (incluida la deformación lenta de los blobs) */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

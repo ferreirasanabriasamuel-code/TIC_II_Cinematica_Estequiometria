@@ -1,0 +1,470 @@
+/* ============================================================================
+   acerca.css — Ficha "Sobre este proyecto" y su diálogo
+   ----------------------------------------------------------------------------
+   Solo la usa index.html (junto con base.css y portada.css). El contenido
+   llega desde DATOS.acercaDe y lo inserta js/principal.js.
+
+   Componentes:
+     1. .acercade      → PÍLDORA NEGRA flotante, centrada sobre la línea
+        central, colgada de la INTERSECCIÓN de las dos líneas de la
+        portada (el borde inferior del masthead y la línea vertical):
+        · Escritorio (≥ 960px): fila horizontal — badge de ícono (círculo
+          celeste) cuyo borde superior toca ese punto de cruce, textos
+          (etiqueta + título) a la izquierda, separador vertical fino y
+          «Conocer más →» a la derecha. El alto sale natural del contenido.
+        · Celular (< 960px): cuadrado compacto en la esquina inferior
+          derecha, en posición fija, sin badge ni separador.
+        · Color: negro/grisáceo (el tono del texto principal), distinto de
+          los acentos cian y violeta. En modo oscuro se invierte
+          (css/modo-oscuro.css).
+     2. .dialogo-acercade → diálogo "Conocer más": se abre centrado, con
+        ancho de DOCUMENTO (54rem en PC): los bordes envuelven la columna
+        de lectura (42rem) sin dejar espacio vacío a los costados. Los
+        bloques con subtítulo llevan su número (01, 02…), como los pasos
+        de los paneles. Cierra con Esc, con su botón y con clic en el
+        fondo.
+
+   La píldora horizontal con badge es SOLO para PC (≥ 960px); en celular la
+   ficha queda como el cuadrado compacto de siempre. Mientras un panel está
+   abierto (html .portada--con-panel) la ficha se aparta para no estorbar
+   la lectura.
+   ========================================================================== */
+
+
+/* ========================= 1. Ficha flotante =============================== */
+
+/* Color de la ficha: el mismo tono que el texto principal (negro/grisáceo),
+   distinto de los acentos cian y violeta. En modo oscuro se invierte
+   (css/modo-oscuro.css).
+
+   --acercade-icn-medida fija el tamaño del badge de ícono Y, con ella, la
+   altura a la que cuelga toda la ficha: el badge sobresale de la píldora
+   un 55 % de su medida (ver el transform de .acercade-icn), así que
+   top: calc(esta medida * 0.55) deja el borde superior del círculo
+   exactamente sobre la intersección de las líneas. Cambiar la medida acá
+   mueve el badge y la posición a la vez, sin descuadrar nada. */
+:root {
+  --acercade-fondo: #26232e;
+  --acercade-texto: #f7f6f9;
+  --acercade-suave: rgba(247, 246, 249, 0.78);
+  --acercade-icn-medida: 3.3rem;
+}
+
+/* La ficha es una píldora horizontal (la card entera es el botón); su
+   posición y tamaño los fijan las media queries de abajo. */
+.acercade {
+  position: absolute;
+  z-index: 6;   /* sobre las mitades, la línea central y el masthead
+                   (z 5, sticky desde la capa de animaciones): el badge
+                   cuelga sobre el borde del masthead y la píldora debe
+                   poder pulsarse entera. Queda bajo el panel (z 10) y
+                   el diálogo "Conocer más" (z 30). */
+}
+
+/* La ficha entera es el botón (teclado: Tab + Enter / Espacio). Base en
+   columna (celular); la fila horizontal de PC se define en su media query. */
+.acercade-tarjeta {
+  position: relative;                /* ancla el badge de ícono             */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: var(--espacio-2);
+  width: 100%;
+  height: 100%;
+  padding: var(--espacio-4);
+  border: none;
+  border-radius: var(--radio-grande);
+  background: var(--acercade-fondo);
+  color: var(--acercade-texto);
+  box-shadow: var(--sombra-suave);
+  text-align: left;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    transform var(--duracion) var(--curva),
+    box-shadow var(--duracion) var(--curva);
+}
+
+@media (hover: hover) {
+  .acercade-tarjeta:hover {
+    transform: translateY(-3px) scale(1.02);
+    box-shadow: var(--sombra-panel);
+  }
+}
+
+.acercade-tarjeta:focus-visible {
+  outline-color: var(--acercade-texto);
+  outline-offset: 4px;
+}
+
+.acercade-textos {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.acercade-etiqueta {
+  display: block;
+  margin: 0;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--acercade-suave);
+}
+
+.acercade-titulo {
+  display: block;
+  font-family: var(--fuente-titulos);
+  font-size: 1.35rem;
+  font-weight: 700;
+  line-height: 1.15;
+  color: var(--acercade-texto);
+  margin: 0;
+}
+
+/* Badge de ícono: círculo celeste centrado sobre el borde superior de la
+   píldora. El anillo exterior usa el color del fondo de la página, así que
+   se adapta solo al modo claro y al oscuro. Solo se ve en PC.
+   El translate(-50%, -55%) lo sube un 55 % de su altura: esa porción es
+   la que define, en la media query de abajo, a qué altura cuelga la
+   ficha completa. */
+.acercade-icn {
+  display: none;                     /* en celular no se muestra            */
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translate(-50%, -55%);
+  place-items: center;
+  width: var(--acercade-icn-medida);
+  height: var(--acercade-icn-medida);
+  border-radius: 50%;
+  background: linear-gradient(150deg, #22b7e6 0%, var(--cine-intenso-2) 55%, var(--cine-intenso-1) 100%);
+  color: #ffffff;
+  box-shadow:
+    0 0 0 0.4rem var(--color-fondo),
+    0 6px 18px rgba(7, 89, 133, 0.35);
+}
+
+.acercade-icn svg {
+  width: 1.5rem;
+  height: 1.5rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.9;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* Separador vertical entre los textos y «Conocer más» (solo PC) */
+.acercade-separador { display: none; }
+
+.acercade-enlace {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
+  font-size: 0.64rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--acercade-texto);
+}
+
+.acercade-enlace svg {
+  width: 1em;
+  height: 1em;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: transform var(--duracion) var(--curva);
+}
+
+@media (hover: hover) {
+  .acercade-tarjeta:hover .acercade-enlace svg { transform: translateX(4px); }
+}
+
+/* --- Escritorio: píldora negra centrada, colgada de la intersección ---
+   Centrada sobre la línea central, con el borde superior del badge de
+   ícono tocando el punto donde se unen las dos líneas de la portada: el
+   borde inferior del masthead (horizontal) y la línea central (vertical,
+   que nace en top: 0 del lienzo). Como .acercade vive dentro de
+   .portada-lienzo, esa intersección es su propio (50%, 0); el badge
+   sobresale un 55 % de su medida por encima de la píldora, así que ese
+   mismo factor como top deja el círculo con su borde superior en el
+   cruce, colgado de él como un colgante. Textos (etiqueta + título) a
+   la izquierda, separador vertical fino y «Conocer más →» a la derecha.
+   El ancho es el natural del contenido, con un techo para pantallas
+   angostas. */
+@media (min-width: 960px) {
+  .acercade {
+    left: 50%;
+    right: auto;
+    top: calc(var(--acercade-icn-medida) * 0.55);
+    bottom: auto;
+    transform: translateX(-50%);
+    width: auto;
+    max-width: min(46rem, calc(100vw - 4rem));
+  }
+
+  .acercade-icn {
+    display: grid;
+  }
+
+  .acercade-tarjeta {
+    flex-direction: row;
+    align-items: center;
+    gap: 1.4rem;
+    width: auto;
+    height: auto;
+    padding: 1.05rem 1.7rem;
+  }
+
+  .acercade-separador {
+    display: block;
+    width: 1px;
+    height: 2.7rem;
+    background: var(--acercade-suave);
+    flex: none;
+  }
+
+  .acercade-titulo { font-size: 1.5rem; }
+}
+
+/* Con un panel abierto la ficha se aparta (en celular el panel corre por
+   debajo y la ficha fija estorbaría la lectura) */
+.portada--con-panel .acercade {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition:
+    opacity var(--duracion) var(--curva),
+    visibility var(--duracion);
+}
+
+/* --- Celular: cuadrado compacto en la esquina inferior derecha, fijo,
+       sobre la burbuja decorativa de la mitad de Estequiometría --- */
+@media (max-width: 959px) {
+  .acercade {
+    position: fixed;
+    left: auto;
+    right: clamp(0.75rem, 3vw, 1.25rem);
+    top: auto;
+    bottom: clamp(0.75rem, 3dvh, 1.5rem);
+    transform: none;
+    width: clamp(7rem, 26vw, 9rem);
+    aspect-ratio: 1 / 1;
+  }
+
+  .acercade-tarjeta {
+    padding: 0.85rem 0.8rem;
+    gap: 0.45rem;
+  }
+
+  /* En el cuadrado chico entran el título y el enlace; la etiqueta y la
+     bajada quedan para el diálogo "Conocer más" */
+  .acercade-etiqueta { display: none; }
+  .acercade-icn { display: none; }
+  .acercade-separador { display: none; }
+
+  .acercade-titulo { font-size: 0.95rem; }
+
+  .acercade-enlace { font-size: 0.56rem; letter-spacing: 0.14em; }
+
+  .acercade-enlace svg { display: none; }
+}
+
+
+/* ========================= 2. Diálogo "Conocer más" ====================== */
+
+.dialogo-acercade {
+  position: fixed;
+  inset: 0;
+  z-index: 30;                       /* por encima de los paneles (z 10)    */
+  display: grid;
+  place-items: center;               /* el diálogo se abre centrado        */
+  padding: var(--espacio-4);
+  background: rgba(21, 22, 29, 0.45);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+}
+
+.dialogo-acercade[hidden] { display: none; }
+
+/* Tarjeta del diálogo: ancho de DOCUMENTO, a la medida de su columna de
+   lectura (42rem): los bordes quedan a ~6rem del texto, envolviéndolo sin
+   dejar espacio vacío a los costados. Centrada en pantalla. (En celular,
+   más abajo, sigue ocupando todo el ancho, como los paneles.) */
+.dialogo-acercade-tarjeta {
+  position: relative;
+  width: min(54rem, calc(100vw - 3rem));
+  max-height: min(90dvh, 60rem);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: var(--espacio-6) var(--espacio-4) var(--espacio-5);
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio-grande);
+  background: var(--color-fondo);
+  box-shadow: var(--sombra-panel);
+  animation: aparecer var(--duracion) var(--curva) both;
+}
+
+/* Columna de lectura: la misma medida que el cuerpo de los paneles */
+.dialogo-cuerpo {
+  width: min(42rem, 100%);
+  margin-inline: auto;
+}
+
+/* En celular el diálogo ocupa casi todo el ancho, como los paneles */
+@media (max-width: 959px) {
+  .dialogo-acercade { padding: var(--espacio-2); }
+
+  .dialogo-acercade-tarjeta { width: 100%; }
+}
+
+/* Botón de cierre: cruz de trazo fino arriba a la derecha */
+.dialogo-cerrar {
+  position: absolute;
+  top: var(--espacio-3);
+  right: var(--espacio-3);
+  display: grid;
+  place-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio-chico);
+  background: var(--color-fondo);
+  color: var(--color-texto);
+  transition:
+    border-color var(--duracion) var(--curva),
+    background-color var(--duracion) var(--curva),
+    color var(--duracion) var(--curva),
+    transform var(--duracion) var(--curva);
+}
+
+.dialogo-cerrar svg {
+  width: 1.15rem;
+  height: 1.15rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.75;
+  stroke-linecap: round;
+}
+
+.dialogo-cerrar:hover {
+  border-color: var(--color-texto);
+  background: var(--color-crema);
+}
+
+.dialogo-cerrar:focus-visible { outline-color: var(--color-texto); }
+
+/* Contenido del diálogo */
+.dialogo-etiqueta {
+  margin: 0 0 var(--espacio-2);
+  font-size: 0.64rem;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--color-texto-suave);
+}
+
+.dialogo-titulo {
+  font-size: clamp(1.6rem, 3vw, 2rem);
+  font-weight: 700;
+  color: var(--color-texto);
+  margin: 0 0 var(--espacio-3);
+  padding-right: 3rem;              /* deja lugar al botón de cierre       */
+}
+
+.dialogo-parrafo {
+  color: var(--color-texto-suave);
+  margin: 0 0 var(--espacio-3);
+  text-align: justify;
+  hyphens: auto;
+}
+
+/* Subtítulos editoriales que organizan el texto extendido del diálogo
+   (mismo sistema tipográfico que los bloques de teoría de los paneles) */
+.dialogo-subtitulo {
+  font-family: var(--fuente-titulos);
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--color-texto);
+  margin: var(--espacio-4) 0 var(--espacio-2);
+}
+
+/* Números de bloque ("01", "02"…) en microcopy, a juego con los pasos de
+   los paneles de los temas. Solo en escritorio: el nuevo estilo del
+   apartado es solo para PC y en celular el diálogo queda como estaba. */
+.dialogo-numero {
+  display: none;                     /* en celular no se muestra            */
+  margin: 0 0 var(--espacio-1);
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.24em;
+  color: var(--color-texto-suave);
+}
+
+@media (min-width: 960px) {
+  .dialogo-numero {
+    display: block;
+    margin-top: var(--espacio-4);    /* aire sobre cada bloque numerado     */
+  }
+
+  /* Con el número arriba, el subtítulo arranca pegado a él */
+  .dialogo-subtitulo { margin-top: 0; }
+}
+
+/* Pie del diálogo: equipo y curso */
+.dialogo-equipo {
+  margin: var(--espacio-4) 0 0;
+  padding-top: var(--espacio-3);
+  border-top: 1px solid var(--color-borde);
+}
+
+.dialogo-equipo p { margin: 0; }
+
+.dialogo-integrantes {
+  font-weight: 600;
+  color: var(--color-texto);
+}
+
+.dialogo-meta {
+  font-size: 0.78rem;
+  color: var(--color-texto-suave);
+}
+
+/* Botón rectangular horizontal que cierra el diálogo: "Gracias por
+   apoyarnos". Abre un video de YouTube en pestaña nueva. */
+.dialogo-gracias {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 3.25rem;
+  margin-top: var(--espacio-4);
+  padding: 0.85rem 2.1rem;
+  border-radius: var(--radio-boton);
+  background: var(--color-texto);
+  color: var(--color-fondo);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition:
+    transform var(--duracion) var(--curva),
+    filter var(--duracion) var(--curva);
+}
+
+@media (hover: hover) {
+  .dialogo-gracias:hover {
+    transform: translateY(-2px);
+    filter: brightness(1.15);
+  }
+}
+
+.dialogo-gracias:active {
+  transform: scale(0.97);
+  transition-duration: 0.15s;
+}

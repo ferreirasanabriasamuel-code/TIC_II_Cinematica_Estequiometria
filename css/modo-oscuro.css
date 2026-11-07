@@ -1,0 +1,225 @@
+/* ============================================================================
+   modo-oscuro.css — Paleta oscura del sitio (modo claro/oscuro)
+   ----------------------------------------------------------------------------
+   Se carga DESPUÉS de base.css / portada.css / juego.css en todas las
+   páginas, junto con js/modo.js.
+
+   REGLA DE DISEÑO: el modo claro no se modifica en absoluto. Toda la
+   paleta oscura vive en este archivo y solo se activa cuando <html> lleva
+   data-modo="oscuro" (lo deciden el script del <head> y el interruptor).
+
+   Coherencia con el sistema existente: se redefinen LAS MISMAS variables
+   de :root (css/base.css), con la misma lógica editorial — fondo oscuro
+   neutro, texto claro, acentos cian/violeta más luminosos para mantener
+   el contraste, tarjetas sobre superficies apenas más claras.
+   ========================================================================== */
+
+
+/* ============================ 1. Variables ================================ */
+
+html[data-modo="oscuro"] {
+  color-scheme: dark;                /* controles y barras nativas oscuras  */
+
+  /* --- Colores de base (papel editorial invertido) --- */
+  --color-fondo: #15161d;            /* noche neutra, fría                */
+  --color-crema: #1d1f29;            /* superficie de tarjetas y fórmulas */
+  --color-texto: #e9e7ee;            /* tinta clara                        */
+  --color-texto-suave: #a7a2b4;      /* gris atenuado                      */
+  --color-borde: #2c2f3c;            /* filetes y divisores finos          */
+  --color-borde-fuerte: #4a4f63;     /* contornos de casillas y controles  */
+
+  /* --- Retroalimentación de los juegos (translúcida sobre oscuro) --- */
+  --color-exito: #10b981;
+  --color-exito-fondo: rgba(16, 185, 129, 0.14);
+  --color-error: #f87171;
+  --color-error-fondo: rgba(248, 113, 113, 0.13);
+
+  /* --- Acento de Cinemática (celeste-cian luminoso) --- */
+  --cine-intenso-1: #0e7490;        /* extremo profundo del degradado      */
+  --cine-intenso-2: #22d3ee;        /* extremo claro del degradado         */
+  --cine-tinta: #a5e5f4;            /* texto cian legible                 */
+  --cine-tinte: #122530;            /* fondo de fórmulas, chips y avisos   */
+  --cine-texto-suave: #9db9c7;      /* gris azulado atenuado              */
+  --cine-punto: rgba(34, 211, 238, 0.34);
+
+  /* --- Acento de Estequiometría (violeta luminoso) --- */
+  --este-intenso-1: #6d28d9;        /* extremo profundo del degradado      */
+  --este-intenso-2: #a78bfa;        /* extremo claro del degradado         */
+  --este-tinta: #d3c5fe;            /* texto violeta legible               */
+  --este-tinte: #271d40;            /* fondo de fórmulas, chips y avisos    */
+  --este-texto-suave: #b3a9d1;      /* gris violáceo atenuado             */
+  --este-punto: rgba(167, 139, 250, 0.30);
+
+  /* --- Card "Sobre este proyecto": se invierte (clara sobre oscuro) --- */
+  --acercade-fondo: #e9e7ee;
+  --acercade-texto: #15161d;
+  --acercade-suave: rgba(21, 22, 29, 0.75);
+
+  /* --- Sombras: más profundas sobre oscuro --- */
+  --sombra-suave: 0 2px 6px rgba(0, 0, 0, 0.30), 0 18px 44px rgba(0, 0, 0, 0.45);
+  --sombra-panel: 0 0 0 1px rgba(0, 0, 0, 0.42), 0 32px 80px rgba(0, 0, 0, 0.60);
+}
+
+/* Acento fuerte de cada tema en oscuro: los TÍTULOS y textos fuertes usan
+   un tono claro y legible; los BOTONES mantienen el acento y se les da
+   texto oscuro (ver componentes, más abajo). El foco visible también
+   pasa a un tono claro. */
+html[data-modo="oscuro"] .tema-cinematica {
+  --acento: #22d3ee;
+  --acento-oscuro: #7dd3fc;
+  --color-foco: #7dd3fc;
+}
+
+html[data-modo="oscuro"] .tema-estequiometria {
+  --acento: #a78bfa;
+  --acento-oscuro: #c4b5fd;
+  --color-foco: #c4b5fd;
+}
+
+
+/* ======================= 2. Ajustes puntuales ============================ */
+/* Solo los casos donde un color estaba fijado "en claro" y necesita su
+   equivalente en oscuro. El resto del sitio ya usa variables y se adapta
+   solo. Ninguna de estas reglas afecta al modo claro.                     */
+
+/* Botones sólidos (CTA): en oscuro el acento es claro, así que el texto
+   pasa a oscuro para mantener el contraste. */
+html[data-modo="oscuro"] .boton-primario,
+html[data-modo="oscuro"] .mitad-boton,
+html[data-modo="oscuro"] .juego-boton,
+html[data-modo="oscuro"] .video-play {
+  color: #10131a;
+}
+
+html[data-modo="oscuro"] .video-play svg { fill: #10131a; }
+
+html[data-modo="oscuro"] .boton-primario:focus-visible,
+html[data-modo="oscuro"] .juego-boton:focus-visible {
+  outline-color: #e9e7ee;
+}
+
+/* El velo del cursor sobre el video sigue siendo oscuro en ambos modos */
+html[data-modo="oscuro"] .video::after { background: #000000; }
+
+/* Fondos translúcidos de las barras fijas (blur): su equivalente oscuro */
+html[data-modo="oscuro"] .panel-barra,
+html[data-modo="oscuro"] .juego-cabecera {
+  background: rgba(21, 22, 29, 0.92);
+}
+
+/* --- Encabezados al hacer scroll (css/animaciones.css) ------------------- */
+/* Masthead de la portada: translúcido siempre (el fondo animado respira
+   detrás) y más transparente + blur al superar ~50 px de scroll.           */
+html[data-modo="oscuro"] .portada-cabecera {
+  background: rgba(21, 22, 29, 0.9);
+}
+
+html[data-modo="oscuro"] .portada-cabecera--desplazada {
+  background: rgba(21, 22, 29, 0.72);
+}
+
+html[data-modo="oscuro"] .panel-barra--desplazada,
+html[data-modo="oscuro"] .juego-cabecera--desplazada {
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.38);
+}
+
+/* --- Fondo animado de la portada (css/animaciones.css) ------------------- */
+/* Superficies de la portada levemente translúcidas: la onda PlasmaWave
+   (violeta #A855F7 y cian #06B6D4) se adivina detrás sin quitar
+   legibilidad. */
+html[data-modo="oscuro"] .mitad {
+  background: rgba(21, 22, 29, 0.88);
+}
+
+/* Velo que atenúa la mitad no elegida de la portada */
+html[data-modo="oscuro"] .mitad--segunda::after {
+  background: #15161d;
+  opacity: 0.62;
+}
+
+/* Toast: en claro es tinta oscura con texto blanco; en oscuro se invierte */
+html[data-modo="oscuro"] .toast {
+  background: #e9e7ee;
+  color: #15161d;
+}
+
+/* Botones/íconos con superficie --color-fondo ya se adaptan solos;
+   este ajuste cubre el "hover" del botón del panel, que usaba tinte. */
+html[data-modo="oscuro"] .panel-boton:hover,
+html[data-modo="oscuro"] .juego-menu:hover,
+html[data-modo="oscuro"] .juego-volver:hover,
+html[data-modo="oscuro"] .juego-reiniciar:hover {
+  color: var(--acento-oscuro);
+}
+
+/* --- Galería acordeón del banco (css/accordion-gallery.css) --------------- */
+/* Las fotos ya no llevan velo oscuro: la etiqueta es un chip de vidrio
+   pequeño. En modo oscuro el chip pasa a vidrio oscuro con texto claro. */
+html[data-modo="oscuro"] .ag-panel__label {
+  color: var(--ag-text, #ffffff);
+}
+
+/* Chip "Jugar" de las tarjetas de actividades: sobre la tarjeta oscura el
+   tinte suave del tema casi no se nota; un poco más de tinte mantiene el
+   chip visible como botón. */
+html[data-modo="oscuro"] .vidrio-jugar .glass-surface__tint {
+  background: color-mix(in srgb, var(--acento-oscuro) 26%, transparent) !important;
+}
+
+html[data-modo="oscuro"] .ag-panel__text {
+  background: rgba(29, 31, 41, 0.62);
+  border-color: rgba(255, 255, 255, 0.16);
+}
+
+html[data-modo="oscuro"] .ag-panel:focus-visible {
+  box-shadow:
+    0 0 0 2px var(--ag-accent, #ffffff),
+    0 10px 30px -18px rgba(0, 0, 0, 0.8);
+}
+
+
+/* ================== 3. Interruptor del modo (compartido) ================== */
+/* Botón cuadrado de trazo fino, igual que los demás íconos de las barras.
+   Lleva DOS íconos (luna y sol): en modo claro se ve la luna (invita a
+   oscurecer) y en modo oscuro el sol (invita a aclarar).                  */
+
+.interruptor-modo {
+  display: grid;
+  place-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  padding: 0;
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio-chico);
+  background: var(--color-fondo);
+  color: var(--color-texto);
+  flex: none;
+  transition:
+    border-color var(--duracion) var(--curva),
+    background-color var(--duracion) var(--curva),
+    color var(--duracion) var(--curva);
+}
+
+.interruptor-modo svg {
+  width: 1.15rem;
+  height: 1.15rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.75;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.interruptor-modo:hover {
+  border-color: var(--acento);
+  background: var(--tinte);
+  color: var(--acento-oscuro);
+}
+
+.interruptor-modo:focus-visible { outline-color: var(--acento-oscuro); }
+
+/* Cambio de ícono: luna en claro, sol en oscuro */
+.interruptor-modo .icono-sol { display: none; }
+
+html[data-modo="oscuro"] .interruptor-modo .icono-sol { display: block; }
+html[data-modo="oscuro"] .interruptor-modo .icono-luna { display: none; }

@@ -1,0 +1,516 @@
+/* ============================================================================
+   extras.css — Componentes de las secciones nuevas (Parte 2 de TIC II)
+   ----------------------------------------------------------------------------
+   Lo cargan index.html y TODAS las páginas de juegos, junto con base.css
+   (y portada.css o juego.css según la página).
+
+   Contiene (todo con las variables de :root de css/base.css):
+     1. Ficha técnica del video educativo
+     2. Banco de imágenes (5 tarjetas por tema, con crédito)
+     3. Autoevaluación (cuestionario en texto plano + Google Forms)
+     4. Recursos complementarios (referencias APA pendientes)
+     5. Interruptor de modo claro/oscuro: envoltorios de las barras
+     6. Motores de juego nuevos: completar · clasificar · adivina · emparejar
+
+   Ninguna de estas reglas altera el estilo claro existente: son componentes
+   nuevos que reutilizan el mismo sistema de diseño.
+   ========================================================================== */
+
+
+/* ==================== 1. Ficha técnica del video ========================= */
+
+.ficha-video {
+  margin: var(--espacio-2) 0 0;
+  max-width: 26rem;
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio-medio);
+  background: var(--color-crema);
+  overflow: hidden;
+}
+
+.ficha-fila {
+  display: grid;
+  grid-template-columns: 6.5rem 1fr;
+  gap: var(--espacio-2);
+  padding: 0.55rem var(--espacio-3);
+}
+
+.ficha-fila + .ficha-fila { border-top: 1px solid var(--color-borde); }
+
+.ficha-clave {
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--texto-suave-tema);
+}
+
+.ficha-valor {
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: var(--color-texto);
+}
+
+.ficha-valor.ficha-valor--pendiente {
+  color: var(--color-texto-suave);
+}
+
+
+/* ==================== 2. Banco de imágenes ================================ */
+
+.banco-rejilla {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(13rem, 1fr));
+  gap: var(--espacio-3);
+}
+
+.imagen-tarjeta {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: var(--espacio-3);
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio-grande);
+  background: var(--color-fondo);
+  overflow: hidden;
+  transition:
+    border-color var(--duracion) var(--curva),
+    transform var(--duracion) var(--curva),
+    box-shadow var(--duracion) var(--curva);
+}
+
+.imagen-numero {
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--acento);
+  margin: 0 0 var(--espacio-2);
+}
+
+/* Marco de la imagen: mientras no haya archivo real, queda como casilla
+   pendiente (borde punteado), igual que los botones sin completar. */
+.imagen-marco {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 4 / 3;
+  padding: var(--espacio-3);
+  border: 2px dashed var(--color-borde-fuerte);
+  border-radius: var(--radio-medio);
+  background: var(--tinte);
+  color: var(--texto-suave-tema);
+  font-size: 0.8rem;
+  line-height: 1.55;
+  text-align: center;
+}
+
+/* Cuando la imagen esté real, se puede apuntar el archivo así
+   (los datos se completan en js/datos.js, ver README). */
+.imagen-marco img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: var(--radio-medio);
+}
+
+.imagen-credito {
+  margin: var(--espacio-2) 0 0;
+  padding-top: var(--espacio-2);
+  border-top: 1px solid var(--color-borde);
+  font-size: 0.75rem;
+  line-height: 1.5;
+  color: var(--color-texto-suave);
+}
+
+
+/* ==================== 3. Autoevaluación =================================== */
+
+.autoevaluacion {
+  padding: var(--espacio-4);
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio-grande);
+  background: var(--color-crema);
+}
+
+.autoevaluacion-instrucciones {
+  color: var(--texto-suave-tema);
+  margin: 0 0 var(--espacio-3);
+  text-align: justify;
+  hyphens: auto;
+}
+
+/* Cuestionario en texto plano: lista numerada, una pregunta por renglón */
+.autoevaluacion-preguntas {
+  margin: 0 0 var(--espacio-4);
+  padding: 0 0 0 1.5em;
+  counter-reset: pregunta;
+}
+
+.autoevaluacion-pregunta {
+  list-style: none;
+  position: relative;
+  margin: 0 0 var(--espacio-3);
+  padding-left: 2.2em;
+  color: var(--color-texto);
+  line-height: 1.6;
+}
+
+.autoevaluacion-pregunta:last-child { margin-bottom: 0; }
+
+/* Número de pregunta en casilla cuadrada del tema (microcopy) */
+.autoevaluacion-pregunta::before {
+  counter-increment: pregunta;
+  content: counter(pregunta, decimal-leading-zero);
+  position: absolute;
+  left: 0;
+  top: 0.25em;
+  display: inline-grid;
+  place-items: center;
+  width: 1.6em;
+  height: 1.6em;
+  border-radius: 6px;
+  background: var(--tinte);
+  color: var(--acento-oscuro);
+  font-size: 0.62em;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.autoevaluacion-forms { margin-top: var(--espacio-2); }
+
+/* Botón del cuestionario centrado en la tarjeta (con o sin el montaje de
+   vidrio, que reemplaza al enlace en el mismo lugar del flujo); la nota
+   que lo acompaña se centra también para no quedar descolgada. */
+.autoevaluacion > .vidrio-primario,
+.autoevaluacion > .autoevaluacion-forms {
+  margin-inline: auto;
+}
+
+.autoevaluacion > .presentacion-nota {
+  text-align: center;
+  /* La nota lleva max-width (css/portada.css): se centra también su caja
+     para que el texto no quede arrimado al borde izquierdo de la tarjeta */
+  margin-inline: auto;
+}
+
+
+/* ==================== 4. Recursos complementarios (APA) =================== */
+
+.recursos-apa {
+  margin: var(--espacio-4) 0 0;
+  padding: var(--espacio-4);
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio-grande);
+  background: var(--color-crema);
+}
+
+.recursos-apa-titulo {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--acento-oscuro);
+  margin: 0 0 var(--espacio-2);
+}
+
+.recursos-apa-nota {
+  font-size: 0.85rem;
+  line-height: 1.65;
+  color: var(--texto-suave-tema);
+  margin: 0 0 var(--espacio-3);
+  text-align: justify;
+  hyphens: auto;
+}
+
+.recursos-apa-lista {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--espacio-2);
+}
+
+/* Cada recurso: dentro de la casilla, el botón de vidrio hacia el sitio
+   (clases boton-primario boton-presentacion: prepararPanel lo vitra con
+   el color del tema) y, debajo, la cita APA como descripción. min-width: 0
+   permite que la casilla se ajuste al ancho disponible pese al mínimo de
+   contenido que impone la cuadrícula. */
+.recursos-apa-item {
+  display: grid;
+  gap: var(--espacio-3);
+  justify-items: start;
+  min-width: 0;
+  padding: var(--espacio-3);
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio-medio);
+  font-size: 0.82rem;
+  line-height: 1.6;
+  color: var(--color-texto-suave);
+}
+
+/* La cita contiene URLs larguísimas: sin esto fuerzan el ancho mínimo del
+   ítem y desbordan la pantalla en celulares. */
+.recursos-apa-referencia {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+/* El botón de vidrio se centra dentro de la casilla (la cita APA de abajo
+   mantiene su alineación de lectura a la izquierda). Cubre el enlace sin
+   vitrar y el montaje .vidrio-primario que deja en su lugar. */
+.recursos-apa-item > .vidrio-primario,
+.recursos-apa-item > .recursos-apa-boton {
+  justify-self: center;
+}
+
+
+/* ============ 5. Interruptor de modo: envoltorios de las barras ========== */
+/* index.html agrupa "integrantes + interruptor" a la derecha del masthead;
+   las páginas de juego agrupan "índice + interruptor" en su barra.       */
+
+.portada-cabecera-derecha {
+  display: flex;
+  align-items: center;
+  gap: var(--espacio-3);
+}
+
+.juego-cabecera-acciones {
+  display: flex;
+  align-items: center;
+  gap: var(--espacio-2);
+  justify-self: end;
+}
+
+
+/* ============ 6. Motores de juego nuevos ================================== */
+/* Cuatro categorías nuevas, reutilizando botones y casillas existentes.    */
+
+/* --- Motor: completar espacios ------------------------------------------- */
+
+.completar-item {
+  margin: 0 0 var(--espacio-4);
+}
+
+.completar-item:last-child { margin-bottom: 0; }
+
+.completar-texto {
+  color: var(--texto-suave-tema);
+  line-height: 2;                    /* aire para los huecos en línea        */
+}
+
+.completar-hueco {
+  display: inline-block;
+  min-width: 4.5em;
+  margin: 0 0.15em;
+  padding: 0.1em 0.55em;
+  border: none;
+  border-bottom: 2px solid var(--acento);
+  border-radius: var(--radio-chico) var(--radio-chico) 0 0;
+  background: var(--tinte);
+  color: var(--acento-oscuro);
+  font: inherit;
+  font-weight: 600;
+  text-align: center;
+  vertical-align: baseline;
+  transition:
+    border-color var(--duracion) var(--curva),
+    background-color var(--duracion) var(--curva),
+    color var(--duracion) var(--curva),
+    transform var(--duracion) var(--curva);
+}
+
+.completar-hueco:hover:not(:disabled) { border-bottom-color: var(--acento-oscuro); }
+
+.completar-hueco:focus-visible { outline-color: var(--acento-oscuro); }
+
+.completar-hueco.es-correcta {
+  border-bottom-color: var(--color-exito);
+  background: var(--color-exito-fondo);
+  color: var(--color-exito);
+}
+
+.completar-hueco.es-incorrecta {
+  border-bottom-color: var(--color-error);
+  background: var(--color-error-fondo);
+  color: var(--color-error);
+}
+
+/* --- Motor: clasificar ----------------------------------------------------- */
+
+.clasificar-item {
+  margin: 0 0 var(--espacio-2);
+  padding: var(--espacio-3);
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio-medio);
+  background: var(--color-fondo);
+}
+
+.clasificar-item.es-correcta {
+  border-color: var(--color-exito);
+  background: var(--color-exito-fondo);
+}
+
+.clasificar-item.es-incorrecta {
+  border-color: var(--color-error);
+  background: var(--color-error-fondo);
+}
+
+.clasificar-texto {
+  margin: 0 0 var(--espacio-2);
+  color: var(--color-texto);
+}
+
+.clasificar-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--espacio-2);
+}
+
+.clasificar-chip {
+  padding: 0.45rem 0.95rem;
+  border: 1px solid var(--color-borde-fuerte);
+  border-radius: var(--radio-pill);
+  background: var(--color-fondo);
+  color: var(--color-texto-suave);
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  transition:
+    border-color var(--duracion) var(--curva),
+    background-color var(--duracion) var(--curva),
+    color var(--duracion) var(--curva),
+    transform var(--duracion) var(--curva);
+}
+
+.clasificar-chip:hover { border-color: var(--acento); }
+
+.clasificar-chip:focus-visible { outline-color: var(--acento-oscuro); }
+
+.clasificar-chip[aria-pressed="true"] {
+  border-color: var(--acento-oscuro);
+  background: var(--acento-oscuro);
+  color: #ffffff;
+}
+
+html[data-modo="oscuro"] .clasificar-chip[aria-pressed="true"] {
+  color: #10131a;
+}
+
+/* --- Motor: adivina el término --------------------------------------------- */
+
+.adivina-pista {
+  margin: 0 0 var(--espacio-3);
+  padding: var(--espacio-3);
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio-medio);
+  background: var(--tinte);
+  color: var(--acento-oscuro);
+}
+
+.adivina-pista .adivina-pista-etiqueta {
+  display: block;
+  margin-bottom: var(--espacio-1);
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--texto-suave-tema);
+}
+
+.adivina-letras {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin: 0 0 var(--espacio-4);
+}
+
+.adivina-letra {
+  display: grid;
+  place-items: center;
+  width: 2.2rem;
+  height: 2.7rem;
+  border: 1px solid var(--color-borde-fuerte);
+  border-bottom-width: 3px;
+  border-radius: var(--radio-chico);
+  background: var(--tinte);
+  font-family: var(--fuente-titulos);
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--acento-oscuro);
+}
+
+.adivina-letra--vacia { background: transparent; }
+
+.adivina-letra--fallo { color: var(--color-error); border-color: var(--color-error); }
+
+.adivina-teclado {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 0.4rem;
+  margin: 0 0 var(--espacio-3);
+}
+
+@media (max-width: 480px) {
+  .adivina-teclado { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+}
+
+.adivina-tecla {
+  height: 2.6rem;
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio-chico);
+  background: var(--color-fondo);
+  color: var(--color-texto);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  transition:
+    border-color var(--duracion) var(--curva),
+    background-color var(--duracion) var(--curva),
+    opacity var(--duracion) var(--curva),
+    transform var(--duracion) var(--curva);
+}
+
+.adivina-tecla:hover:not(:disabled) { border-color: var(--acento); }
+
+.adivina-tecla:focus-visible { outline-color: var(--acento-oscuro); }
+
+.adivina-tecla:disabled { opacity: 0.35; cursor: default; }
+
+.adivina-tecla.adivina-tecla--acierto {
+  border-color: var(--color-exito);
+  background: var(--color-exito-fondo);
+  color: var(--color-exito);
+  opacity: 1;
+}
+
+.adivina-tecla.adivina-tecla--fallo {
+  border-color: var(--color-error);
+  background: var(--color-error-fondo);
+  color: var(--color-error);
+  opacity: 1;
+}
+
+/* --- Motor: emparejar ------------------------------------------------------- */
+/* Reutiliza .ordenar-zonas, .ordenar-item y .ordenar-item-num (juego.css);
+   solo agrega los estados de selección y enlace.                          */
+
+.ordenar-item.esta-seleccionada {
+  border-color: var(--acento);
+  background: var(--tinte);
+  box-shadow: var(--sombra-suave);
+}
+
+.ordenar-item.esta-vinculada {
+  border-color: var(--color-borde-fuerte);
+  background: var(--color-crema);
+}
+
+.ordenar-item.esta-vinculada.es-correcta {
+  border-color: var(--color-exito);
+  background: var(--color-exito-fondo);
+}
+
+.ordenar-item.esta-vinculada.es-incorrecta {
+  border-color: var(--color-error);
+  background: var(--color-error-fondo);
+}

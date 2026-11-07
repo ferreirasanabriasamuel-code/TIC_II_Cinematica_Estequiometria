@@ -1,0 +1,222 @@
+/* ============================================================================
+   accordion-gallery.css — Galería acordeón del banco de imágenes
+   ----------------------------------------------------------------------------
+   1) Estilos del componente «AccordionGallery» de react-bits (JS-CSS),
+      adaptados: sin la capa de velo oscuro del original (degradado inferior
+      y oscurecido del 35 %) para que las fotos se vean con su color natural.
+   2) Bloque de integración con este sitio: márgenes del ancla, leyendas del
+      banco (descripción y crédito) y ajustes para pantallas táctiles.
+   ========================================================================== */
+
+/* ---------- 1. Componente (react-bits, adaptado) ------------------------- */
+
+.accordion-gallery {
+  --ag-accent: #ffffff;
+  --ag-text: #ffffff;
+  --ag-gap: 10px;
+  --ag-radius: 16px;
+  --ag-media-size: 320px;
+
+  display: flex;
+  flex-direction: row;
+  gap: var(--ag-gap);
+  width: 100%;
+  max-width: 100%;
+  perspective: 1400px;
+  perspective-origin: 50% 50%;
+}
+
+.accordion-gallery--vertical {
+  flex-direction: column;
+}
+
+.ag-panel {
+  position: relative;
+  flex: 1 1 0;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  border-radius: var(--ag-radius);
+  cursor: pointer;
+  display: block;
+  text-decoration: none;
+  outline: none;
+  transform-style: preserve-3d;
+  transform-origin: center center;
+  background: var(--color-crema, #faf8f4);   /* respaldo mientras carga la foto */
+  box-shadow: 0 10px 30px -18px rgba(0, 0, 0, 0.8);
+  will-change: flex-grow, transform;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.ag-panel:focus-visible {
+  box-shadow:
+    0 0 0 2px var(--color-texto, #26232e),
+    0 10px 30px -18px rgba(0, 0, 0, 0.8);
+}
+
+.ag-panel__frame {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-radius: inherit;
+}
+
+.ag-panel__media {
+  --ag-gray: 1;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: var(--ag-media-size);
+  height: 100%;
+  filter: grayscale(var(--ag-gray));
+  will-change: transform, filter;
+}
+
+.accordion-gallery--vertical .ag-panel__media {
+  width: 100%;
+  height: var(--ag-media-size);
+}
+
+.ag-panel__media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+/* Sin velo sobre las fotos, la etiqueta pasa a ser un chip de vidrio
+   pequeño: se lee sobre cualquier imagen sin taparla y acompaña el
+   lenguaje de vidrio del sitio. Se desvanece junto con el texto (GSAP)
+   en los paneles inactivos y queda fijo en pantallas táctiles. */
+.ag-panel__label {
+  position: absolute;
+  left: 20px;
+  bottom: 20px;
+  right: 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  pointer-events: none;
+  z-index: 2;
+  color: var(--color-texto, #26232e);
+}
+
+.ag-panel__bar {
+  flex: 0 0 auto;
+  width: 3px;
+  height: 26px;
+  border-radius: 3px;
+  background: currentColor;
+  opacity: 0;
+  box-shadow: 0 0 12px color-mix(in srgb, currentColor 60%, transparent);
+}
+
+.ag-panel__text {
+  font-family: inherit;
+  font-weight: 600;
+  font-size: clamp(1rem, 1.4vw, 1.4rem);
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  opacity: 0;
+  padding: 0.45rem 0.9rem;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.72);
+  -webkit-backdrop-filter: blur(12px) saturate(1.35);
+  backdrop-filter: blur(12px) saturate(1.35);
+  border: 1px solid rgba(38, 35, 46, 0.14);
+  box-shadow: 0 4px 18px -10px rgba(38, 35, 46, 0.45);
+}
+
+@media (max-width: 520px) {
+  .accordion-gallery {
+    flex-direction: column;
+    perspective: none;
+    height: auto !important;
+  }
+  .ag-panel {
+    min-height: 84px;
+    transform: none !important;
+  }
+  .accordion-gallery .ag-panel__media {
+    width: 100%;
+    height: var(--ag-media-size);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ag-panel,
+  .ag-panel__media {
+    will-change: auto;
+  }
+}
+
+/* ---------- 2. Integración con el sitio ---------------------------------- */
+
+.banco-acordeon {
+  margin: 0 0 var(--espacio-3, 1.5rem);
+}
+
+/* En pantallas medianas el acordeón horizontal se hace más bajo (la altura
+   viene como estilo en línea del componente, por eso el !important) */
+@media (max-width: 760px) {
+  .accordion-gallery {
+    height: 380px !important;
+  }
+}
+
+/* En táctil no hay hover: las etiquetas de todos los paneles quedan a la
+   vista (la opacidad la escribe GSAP en línea, por eso el !important) */
+@media (max-width: 520px) {
+  .ag-panel__bar,
+  .ag-panel__text {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+
+/* Leyendas del banco: número, título, descripción y crédito de cada imagen */
+.banco-leyendas {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+  gap: var(--espacio-3, 1.5rem) var(--espacio-3, 1.5rem);
+}
+
+.leyenda {
+  margin: 0;
+  padding-top: 0.55rem;
+  border-top: 2px solid var(--color-borde-fuerte, #d7d2c8);
+}
+
+.leyenda-numero {
+  margin: 0 0 0.15rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-texto-suave, #6f6a7a);
+}
+
+.leyenda-titulo {
+  margin: 0 0 0.2rem;
+  font-weight: 700;
+}
+
+.leyenda-descripcion {
+  margin: 0 0 0.35rem;
+  font-size: 0.9rem;
+  color: var(--color-texto, #26232e);
+}
+
+.leyenda-credito {
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--color-texto-suave, #6f6a7a);
+}

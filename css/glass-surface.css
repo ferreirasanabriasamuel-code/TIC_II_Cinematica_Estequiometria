@@ -1,0 +1,438 @@
+/* ============================================================================
+   glass-surface.css — Superficies de vidrio (GlassSurface, react-bits)
+   ----------------------------------------------------------------------------
+   Puerto del CSS del componente GlassSurface de react-bits. El original usa
+   light-dark() y color-mix(in oklch, …); acá esas expresiones se traducen al
+   sistema de modo claro/oscuro del sitio (el atributo data-modo en <html>,
+   que maneja js/modo.js) y a rgba() equivalentes, para no depender de
+   light-dark() (que exigiría color-scheme global).
+
+   Tres variantes del componente (las elige js/glass-surface-react.js):
+     .glass-surface--svg       → filtro SVG de desplazamiento (backdrop-filter)
+     .glass-surface--webgl     → refracción WebGL2 con backdrop (canvas/foto)
+     .glass-surface--fallback  → vidrio esmerilado (blur + sheen + rim)
+
+   Capas de cada vidrio (todas absolute, se recortan por border-radius):
+     filter (inertes) → canvas → frame → TINT (extensión del sitio) →
+     sheen/rim (solo fallback) → glow/line (solo shape) → content (children)
+
+   La sección final es la INTEGRACIÓN con el sitio: .vidrio-montaje es el
+   reemplazo del botón original y .vidrio-anfitrion el botón real dentro del
+   vidrio (su fondo/borde/sombra/transform se anulan: el vidrio es la
+   superficie). Los estados hover/active de css/animaciones.css se
+   re-adjuntan al montaje para que todo el vidrio se mueva junto.
+   ========================================================================== */
+
+
+/* ============================ 1. Componente =============================== */
+
+.glass-surface {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  transition: opacity 0.26s ease-out;
+}
+
+.glass-surface__filter {
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  z-index: -1;
+}
+
+.glass-surface__content {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem;
+  border-radius: inherit;
+  position: relative;
+  z-index: 1;
+}
+
+/* --- Variante filtro SVG --------------------------------------------------- */
+
+.glass-surface--svg {
+  background: hsl(0 0% 100% / var(--glass-frost, 0));
+  backdrop-filter: var(--filter-id, url(#glass-filter)) saturate(var(--glass-saturation, 1));
+  box-shadow:
+    0 0 2px 1px rgba(0, 0, 0, 0.15) inset,
+    0 0 10px 4px rgba(0, 0, 0, 0.10) inset,
+    0px 4px 16px rgba(17, 17, 26, 0.05),
+    0px 8px 24px rgba(17, 17, 26, 0.05),
+    0px 16px 56px rgba(17, 17, 26, 0.05),
+    0px 4px 16px rgba(17, 17, 26, 0.05) inset,
+    0px 8px 24px rgba(17, 17, 26, 0.05) inset,
+    0px 16px 56px rgba(17, 17, 26, 0.05) inset;
+}
+
+html[data-modo="oscuro"] .glass-surface--svg {
+  background: hsl(0 0% 0% / var(--glass-frost, 0));
+  box-shadow:
+    0 0 2px 1px rgba(255, 255, 255, 0.35) inset,
+    0 0 10px 4px rgba(255, 255, 255, 0.15) inset,
+    0px 4px 16px rgba(17, 17, 26, 0.05),
+    0px 8px 24px rgba(17, 17, 26, 0.05),
+    0px 16px 56px rgba(17, 17, 26, 0.05),
+    0px 4px 16px rgba(17, 17, 26, 0.05) inset,
+    0px 8px 24px rgba(17, 17, 26, 0.05) inset,
+    0px 16px 56px rgba(17, 17, 26, 0.05) inset;
+}
+
+/* --- Variante WebGL (canvas + frame) --------------------------------------- */
+
+.glass-surface--webgl {
+  box-shadow:
+    0px 4px 16px rgba(17, 17, 26, 0.05),
+    0px 8px 24px rgba(17, 17, 26, 0.05),
+    0px 16px 56px rgba(17, 17, 26, 0.05);
+}
+
+.glass-surface__canvas,
+.glass-surface__frame {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+.glass-surface__frame {
+  background: hsl(0 0% 100% / var(--glass-frost, 0));
+  box-shadow:
+    0 0 2px 1px rgba(0, 0, 0, 0.15) inset,
+    0 0 10px 4px rgba(0, 0, 0, 0.10) inset,
+    0px 4px 16px rgba(17, 17, 26, 0.05) inset,
+    0px 8px 24px rgba(17, 17, 26, 0.05) inset,
+    0px 16px 56px rgba(17, 17, 26, 0.05) inset;
+}
+
+html[data-modo="oscuro"] .glass-surface__frame {
+  background: hsl(0 0% 0% / var(--glass-frost, 0));
+  box-shadow:
+    0 0 2px 1px rgba(255, 255, 255, 0.35) inset,
+    0 0 10px 4px rgba(255, 255, 255, 0.15) inset,
+    0px 4px 16px rgba(17, 17, 26, 0.05) inset,
+    0px 8px 24px rgba(17, 17, 26, 0.05) inset,
+    0px 16px 56px rgba(17, 17, 26, 0.05) inset;
+}
+
+/* --- Extensión del sitio: capa de color (tint) ----------------------------- */
+
+.glass-surface__tint {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+/* --- Variante esmerilada (fallback) ---------------------------------------- */
+
+.glass-surface--fallback {
+  background: hsl(0 0% 100% / calc(0.12 + var(--glass-frost, 0) * 0.5));
+  -webkit-backdrop-filter: blur(12px) saturate(calc(var(--glass-saturation, 1) * 1.4)) brightness(1.04);
+  backdrop-filter: blur(12px) saturate(calc(var(--glass-saturation, 1) * 1.4)) brightness(1.04);
+  box-shadow:
+    inset 0 1px 0 0 hsl(0 0% 100% / 0.85),
+    inset 0 -1px 0 0 hsl(0 0% 100% / 0.35),
+    0 0 2px 1px rgba(0, 0, 0, 0.12) inset,
+    0 0 12px 3px rgba(255, 255, 255, 0.28) inset,
+    0px 4px 16px rgba(17, 17, 26, 0.06),
+    0px 8px 24px rgba(17, 17, 26, 0.06),
+    0px 16px 56px rgba(17, 17, 26, 0.06);
+}
+
+html[data-modo="oscuro"] .glass-surface--fallback {
+  background: hsl(0 0% 100% / calc(0.04 + var(--glass-frost, 0) * 0.3));
+  box-shadow:
+    inset 0 1px 0 0 hsl(0 0% 100% / 0.3),
+    inset 0 -1px 0 0 hsl(0 0% 100% / 0.08),
+    0 0 2px 1px rgba(255, 255, 255, 0.28) inset,
+    0 0 12px 3px rgba(255, 255, 255, 0.10) inset,
+    0px 4px 16px rgba(0, 0, 0, 0.20),
+    0px 8px 24px rgba(0, 0, 0, 0.20),
+    0px 16px 56px rgba(0, 0, 0, 0.20);
+}
+
+.glass-surface__sheen,
+.glass-surface__rim {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+.glass-surface__sheen {
+  background: linear-gradient(
+    135deg,
+    hsl(0 0% 100% / 0.42) 0%,
+    transparent 42%,
+    transparent 64%,
+    hsl(0 0% 100% / 0.18) 100%
+  );
+}
+
+html[data-modo="oscuro"] .glass-surface__sheen {
+  background: linear-gradient(
+    135deg,
+    hsl(0 0% 100% / 0.14) 0%,
+    transparent 42%,
+    transparent 64%,
+    hsl(0 0% 100% / 0.05) 100%
+  );
+}
+
+.glass-surface__rim {
+  padding: 3px;
+  background: linear-gradient(
+    150deg,
+    hsl(0 0% 100% / 0.7),
+    hsl(0 0% 100% / 0.1) 45%,
+    hsl(0 0% 100% / 0.08) 60%,
+    hsl(0 0% 100% / 0.42)
+  );
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#000 0 0) content-box exclude,
+    linear-gradient(#000 0 0);
+}
+
+html[data-modo="oscuro"] .glass-surface__rim {
+  background: linear-gradient(
+    150deg,
+    hsl(0 0% 100% / 0.34),
+    hsl(0 0% 100% / 0.03) 45%,
+    hsl(0 0% 100% / 0.02) 60%,
+    hsl(0 0% 100% / 0.18)
+  );
+}
+
+.glass-surface__line,
+.glass-surface__glow {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+}
+
+.glass-surface--svg .glass-surface__line,
+.glass-surface--webgl .glass-surface__line {
+  background: rgba(0, 0, 0, 0.15);
+}
+
+html[data-modo="oscuro"] .glass-surface--svg .glass-surface__line,
+html[data-modo="oscuro"] .glass-surface--webgl .glass-surface__line {
+  background: rgba(255, 255, 255, 0.35);
+}
+
+.glass-surface--svg .glass-surface__glow,
+.glass-surface--webgl .glass-surface__glow {
+  background: rgba(0, 0, 0, 0.10);
+}
+
+html[data-modo="oscuro"] .glass-surface--svg .glass-surface__glow,
+html[data-modo="oscuro"] .glass-surface--webgl .glass-surface__glow {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.glass-surface--fallback .glass-surface__line {
+  background: rgba(0, 0, 0, 0.12);
+}
+
+html[data-modo="oscuro"] .glass-surface--fallback .glass-surface__line {
+  background: rgba(255, 255, 255, 0.28);
+}
+
+.glass-surface--fallback .glass-surface__glow {
+  background: rgba(255, 255, 255, 0.28);
+}
+
+html[data-modo="oscuro"] .glass-surface--fallback .glass-surface__glow {
+  background: rgba(255, 255, 255, 0.10);
+}
+
+/* Sin backdrop-filter en el navegador: fondo sólido de reserva */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .glass-surface--fallback {
+    background: hsl(0 0% 100% / 0.72);
+  }
+
+  html[data-modo="oscuro"] .glass-surface--fallback {
+    background: hsl(0 0% 12% / 0.72);
+  }
+}
+
+.glass-surface:focus-visible {
+  outline: 2px solid #007aff;
+  outline-offset: 2px;
+}
+
+html[data-modo="oscuro"] .glass-surface:focus-visible {
+  outline-color: #0a84ff;
+}
+
+/* El badge de la píldora "Sobre este proyecto" sobresale del borde: las
+   capas del vidrio ya se recortan por su propio border-radius, así que el
+   contenedor puede dejar de recortar. */
+.glass-surface--desbordado {
+  overflow: visible;
+}
+
+
+/* ==================== 2. Integración con el sitio ========================== */
+/* js/principal.js reemplaza cada botón por .vidrio-montaje (el vidrio) que
+   contiene al botón original convertido en .vidrio-anfitrion: se le anulan
+   fondo, borde, sombra y transform (la superficie ahora es el vidrio) y se
+   conservan sus tamaños, tipografía y colores de texto/ícono.                */
+
+.vidrio-montaje {
+  position: relative;
+  transition: transform var(--duracion) var(--curva);
+}
+
+/* El vidrio llena siempre su montaje; el tamaño lo da el botón de adentro */
+.vidrio-montaje > .glass-surface {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.vidrio-montaje .glass-surface__content {
+  width: 100%;
+  height: 100%;
+  padding: 0;
+}
+
+.vidrio-anfitrion {
+  background: transparent !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+  transform: none !important;
+  /* El posicionamiento lo lleva el montaje: el botón vive dentro del
+     vidrio (si quedara posicionado, se anclaría al vidrio y se movería) */
+  position: static !important;
+  inset: auto !important;
+}
+
+/* El anillo de foco entra hacia adentro para no cortarse en el vidrio */
+.vidrio-anfitrion:focus-visible {
+  outline-offset: -4px;
+}
+
+/* --- Tamaños que debe heredar cada montaje --------------------------------- */
+
+/* Píldora "Sobre este proyecto": en celular llena el cuadrado fijo; en PC
+   el vidrio abraza al botón (que pasa a fila con su badge) */
+.vidrio-acercade {
+  width: 100%;
+  height: 100%;
+}
+
+@media (min-width: 960px) {
+  .vidrio-acercade {
+    width: auto;
+    height: auto;
+  }
+}
+
+/* CTA "Abrir material de lectura" / "Resolver en Google Forms": ancho de
+   documento como el .boton-presentacion original */
+.vidrio-primario {
+  width: min(100%, 26rem);
+}
+
+/* Diálogo "Conocer más": el montaje toma el ancho de la tarjeta y la
+   animación de aparición (en el botón interior el transform está anulado) */
+.vidrio-dialogo {
+  width: min(54rem, calc(100vw - 3rem));
+  animation: aparecer var(--duracion) var(--curva) both;
+}
+
+/* El diálogo lleva párrafos largos: su vidrio es mucho más opaco que el de
+   los botones, para que la lectura quede cómoda sobre la página atenuada */
+.vidrio-dialogo .glass-surface--fallback {
+  background: rgba(255, 255, 255, 0.86);
+}
+
+html[data-modo="oscuro"] .vidrio-dialogo .glass-surface--fallback {
+  background: rgba(21, 22, 29, 0.92);
+}
+
+/* Botón de play del video: centrado por márgenes automáticos dentro del
+   cuadro (el montaje hereda su position absolute + inset y necesita su
+   medida fija para que el centrado por margin auto funcione) */
+.vidrio-play {
+  margin: auto;
+  width: 4.5rem;
+  height: 4.5rem;
+}
+
+/* --- Estados hover/active, re-adjuntados al vidrio ------------------------- */
+/* (Equivalen a los de css/animaciones.css sobre los botones originales.)   */
+
+@media (hover: hover) {
+  .mitad:hover .vidrio-mitad { transform: translateY(-2px) scale(1.03); }
+
+  .vidrio-acercade:hover { transform: translateY(-3px) scale(1.02); }
+
+  .vidrio-icono:hover { transform: scale(1.05); }
+
+  .vidrio-prompt:hover { transform: scale(1.03); }
+
+  .vidrio-primario:hover { transform: translateY(-2px) scale(1.03); }
+
+  .video:hover .vidrio-play { transform: scale(1.06); }
+}
+
+.vidrio-icono:active,
+.vidrio-prompt:active {
+  transform: scale(0.97);
+  transition-duration: 0.15s;
+}
+
+.vidrio-primario:active,
+.vidrio-acercade:active,
+.mitad:active .vidrio-mitad {
+  transform: scale(0.97);
+  transition-duration: 0.15s;
+}
+
+/* --- Actividades interactivas: chip "Jugar" de cada tarjeta ------------- */
+/* El montaje reemplaza al span .juego-tarjeta-accion, hijo del enlace
+   .juego-tarjeta: recupera el margin-top:auto que lo empujaba al fondo de
+   la tarjeta (vidriar() no copia márgenes) y se acota a su contenido para
+   leerse como botón y no como una barra ancha. */
+.vidrio-jugar {
+  margin-top: auto;
+  align-self: flex-start;
+  width: fit-content;
+}
+
+/* El span interior era texto plano sin caja propia: se le da relleno de
+   botón (prevalece sobre el padding-top que le daba portada.css) */
+.vidrio-jugar .vidrio-anfitrion {
+  padding: 0.6em 1.2em;
+  white-space: nowrap;
+}
+
+@media (hover: hover) {
+  .juego-tarjeta:hover .vidrio-jugar {
+    filter: brightness(1.08);
+  }
+}
+
+.vidrio-jugar:active {
+  transform: scale(0.97);
+  transition-duration: 0.15s;
+}

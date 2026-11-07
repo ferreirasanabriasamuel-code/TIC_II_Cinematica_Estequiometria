@@ -1,0 +1,976 @@
+/* ============================================================================
+   portada.css — Portada a pantalla completa y paneles de contenido
+   ----------------------------------------------------------------------------
+   Solo la usa index.html. Depende de las variables y componentes de
+   css/base.css (blob, puntos, micro, boton-primario).
+
+   Estilo: editorial minimalista.
+     · Portada: mitades blancas con un blob orgánico en degradado y un
+       patrón de puntos; títulos grandes en serif; botón CTA sólido.
+     · Paneles: estructura vertical tipo stepper. Barra superior con
+       flecha de vuelta, indicador de paso ("Paso 2 de 7"), botón de
+       guardar posición y menú del índice.
+
+   Estructura:
+     1. Portada: masthead superior + lienzo con las dos mitades
+     2. Mitades: contenido editorial + decoración (blob + puntos)
+     3. Línea central: fina, con degradado de cian a violeta
+     4. Paneles: en escritorio se superponen a la otra mitad; en celular
+        se despliegan debajo de su mitad, sin superposición
+     5. Barra superior del panel (stepper) + menú del índice
+     6. Cabecera editorial del panel y sus siete secciones
+   ========================================================================== */
+
+
+/* ========================= 1. Capa de la portada ========================= */
+
+.portada {
+  min-height: 100vh;
+  min-height: 100dvh;              /* mejor ajuste en navegadores de celular */
+  display: flex;
+  flex-direction: column;
+}
+
+/* Masthead superior: marca a la izquierda, integrantes a la derecha.
+   Alineación vertical centrada: los integrantes ocupan dos renglones y
+   con la alineación por línea base la marca quedaba pegada arriba. */
+.portada-cabecera {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--espacio-3);
+  padding: var(--espacio-3) var(--margen-x);
+  border-bottom: 1px solid var(--color-borde);
+}
+
+/* Marca de la página: serif editorial en mayúsculas, estilo masthead */
+.portada-marca {
+  margin: 0;
+  font-family: var(--fuente-titulos);
+  font-size: 1rem;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--color-texto);
+}
+
+.portada-autores {
+  margin: 0;
+  font-size: 0.78rem;
+  letter-spacing: 0.03em;
+  color: var(--color-texto-suave);
+  text-align: right;
+}
+
+/* Nombres arriba, curso y turno en un renglón propio debajo */
+.portada-autores-curso {
+  display: block;
+  margin-top: 0.15em;
+  font-size: 0.95em;
+}
+
+.portada-autores strong {
+  color: var(--color-texto);
+  font-weight: 600;
+}
+
+@media (max-width: 720px) {
+  .portada-cabecera {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--espacio-1);
+  }
+
+  .portada-autores { text-align: left; }
+}
+
+/* Lienzo que contiene las dos mitades (y los paneles, en celular) */
+.portada-lienzo {
+  flex: 1;
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+
+/* =============================== 2. Mitades ============================== */
+/* Blancas, con el blob orgánico en una esquina y el patrón de puntos.      */
+
+.mitad {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  overflow: hidden;
+  cursor: pointer;
+  border: 0;
+  background: var(--color-fondo);
+  color: var(--color-texto);
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* --- Decoración: blob con degradado del tema + patrón de puntos --- */
+
+.mitad-deco {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+/* Blob: esquina inferior derecha, parcialmente fuera del lienzo */
+.mitad-deco .blob {
+  width: min(30rem, 78%);
+  right: -16%;
+  bottom: -26%;
+  transition: transform 0.5s var(--curva);
+}
+
+/* Patrón de puntos: parche suelto en la esquina superior izquierda */
+.mitad-deco .puntos {
+  width: 42%;
+  height: 46%;
+  left: -3%;
+  top: -3%;
+  opacity: 0.8;
+  transition: opacity var(--duracion) var(--curva);
+}
+
+/* Al pasar el cursor el blob crece un poco y los puntos se acentúan */
+@media (hover: hover) {
+  .mitad:hover .blob { transform: scale(1.06); }
+  .mitad:hover .puntos { opacity: 1; }
+}
+
+/* Al elegir el tema el blob se agranda: es el "momento" de la selección */
+.mitad--activa .blob { transform: scale(1.18); }
+.mitad--activa .puntos { opacity: 1; }
+
+/* La mitad no elegida queda atenuada y en segundo plano; su contenido
+   se desvanece para que nunca quede cortado por el borde del panel */
+.mitad--segunda { filter: saturate(0.7); }
+
+.mitad--segunda .mitad-contenido {
+  opacity: 0;
+  transition: opacity var(--duracion) var(--curva);
+}
+
+.mitad--segunda::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: #ffffff;
+  opacity: 0.55;
+  pointer-events: none;            /* el clic sigue llegando a la mitad */
+}
+
+/* --- Contenido editorial de la mitad --- */
+
+.mitad-contenido {
+  position: relative;
+  z-index: 1;
+  padding: var(--espacio-5) var(--margen-x) var(--espacio-5) clamp(2rem, 9vw, 6.5rem);
+  max-width: 30rem;
+  text-align: left;
+  transition: opacity var(--duracion) var(--curva);
+}
+
+/* Etiqueta en microcopy: "Tema 01 · Física" */
+.mitad-etiqueta {
+  margin: 0 0 var(--espacio-2);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--acento-oscuro);
+  opacity: 0.85;
+}
+
+/* Título grande en serif editorial, texto fuerte en el color primario */
+.mitad-titulo {
+  font-size: clamp(2.5rem, 5.2vw, 4.4rem);
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: -0.015em;
+  color: var(--acento-oscuro);
+  margin: 0 0 var(--espacio-3);
+}
+
+/* Bajada: texto secundario atenuado del tema */
+.mitad-bajada {
+  font-size: 0.9rem;
+  line-height: 1.75;
+  color: var(--texto-suave-tema);
+  max-width: 34ch;
+  margin: 0 0 var(--espacio-4);
+}
+
+/* Botón CTA: rectángulo redondeado sólido en el color primario */
+.mitad-boton {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6em;
+  padding: 0.8rem 1.5rem;
+  border-radius: var(--radio-boton);
+  background: var(--acento-oscuro);
+  color: #ffffff;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  transition: transform var(--duracion) var(--curva), box-shadow var(--duracion) var(--curva);
+}
+
+.mitad-boton svg {
+  width: 1em;
+  height: 1em;
+  transition: transform var(--duracion) var(--curva);
+}
+
+@media (hover: hover) {
+  .mitad:hover .mitad-boton {
+    transform: translateY(-2px) scale(1.03);
+    box-shadow: var(--sombra-suave);
+  }
+
+  .mitad:hover .mitad-boton svg { transform: translateX(4px); }
+}
+
+/* El anillo de foco entra hacia adentro para no cortarse en los bordes */
+.mitad:focus-visible { outline-offset: -6px; }
+
+/* En celulares el contenido se centra un poco más */
+@media (max-width: 959px) {
+  .mitad-contenido {
+    padding-left: var(--margen-x);
+    padding-right: var(--margen-x);
+  }
+
+  .mitad-deco .blob { width: min(14rem, 62%); right: -24%; bottom: -34%; }
+}
+
+
+/* ============================ 3. Línea central =========================== */
+
+.linea-central {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  transform: translateX(-50%);
+  background: var(--degradado-linea);
+  opacity: 0.9;
+  z-index: var(--z-linea);
+  pointer-events: none;
+}
+
+
+/* ============================ 4. Paneles ================================= */
+
+.panel {
+  background: var(--color-fondo);
+}
+
+.panel[hidden] { display: none; }
+
+/* En escritorio: capa fija que se despliega sobre la otra mitad */
+@media (min-width: 960px) {
+  .panel {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+  /* Ancho del panel en escritorio: ajustado manualmente para que ocupe más
+     pantalla al elegir un tema (antes era min(52rem, 100vw)). */
+    width: min(86vw, 90rem);
+    z-index: var(--z-panel);
+    overflow-y: auto;
+    box-shadow: var(--sombra-panel);
+  }
+
+  .panel--cinematica {
+    left: 0;
+    border-right: 1px solid var(--color-borde);
+  }
+
+  .panel--estequiometria {
+    right: 0;
+    border-left: 1px solid var(--color-borde);
+  }
+}
+
+/* Despliegue hacia abajo (desvanecido + subida suave) */
+.panel--abierto {
+  animation: aparecer var(--duracion) var(--curva) both;
+}
+
+/* En celular: las mitades se apilan y cada panel se despliega debajo
+   de su mitad, empujando la otra (sin superposición) */
+@media (max-width: 959px) {
+  .portada-lienzo {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .mitad {
+    flex: 1 1 auto;
+    min-height: 38vh;
+  }
+
+  /* Orden de apilado: mitad → su panel → línea → otra mitad → su panel */
+  .mitad--cinematica     { order: 1; }
+  .panel--cinematica     { order: 2; }
+  .linea-central {
+    order: 3;
+    position: static;
+    transform: none;
+    width: auto;
+    height: 2px;
+    opacity: 0.9;
+  }
+  .mitad--estequiometria { order: 4; }
+  .panel--estequiometria { order: 5; }
+}
+
+
+/* ============== 5. Barra superior del panel (stepper) ==================== */
+/* Flecha de vuelta a la izquierda · indicador de paso centrado ·           */
+/* guardar posición y menú del índice a la derecha. Trazos finos.           */
+
+.panel-barra {
+  position: sticky;
+  top: 0;
+  z-index: 6;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: var(--espacio-3);
+  padding: 0.6rem var(--margen-x);
+  background: rgba(255, 255, 255, 0.94);
+  border-bottom: 1px solid var(--color-borde);
+  /* El blur y la sombra al hacer scroll los aporta css/animaciones.css
+     (.panel-barra--desplazada, activada por js/animaciones.js a los ~50px). */
+}
+
+/* Botones cuadrados de trazo fino (flecha, guardar, menú) */
+.panel-boton {
+  display: grid;
+  place-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  padding: 0;
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio-chico);
+  background: var(--color-fondo);
+  color: var(--color-texto);
+  transition:
+    border-color var(--duracion) var(--curva),
+    background-color var(--duracion) var(--curva),
+    color var(--duracion) var(--curva),
+    transform var(--duracion) var(--curva);
+}
+
+.panel-boton svg {
+  width: 1.15rem;
+  height: 1.15rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.75;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.panel-boton:hover {
+  border-color: var(--acento);
+  background: var(--tinte);
+  color: var(--acento-oscuro);
+}
+
+.panel-boton:focus-visible { outline-color: var(--acento-oscuro); }
+
+/* Indicador de paso centrado: "Paso 2 de 7 · Teoría" */
+.panel-paso {
+  margin: 0;
+  justify-self: center;
+  text-align: center;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--color-texto-suave);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+.panel-paso .panel-paso-nombre {
+  color: var(--acento-oscuro);
+}
+
+@media (max-width: 620px) {
+  /* En pantallas angostas solo queda "Paso 2 de 7" */
+  .panel-paso .panel-paso-nombre { display: none; }
+}
+
+.panel-acciones {
+  display: inline-flex;
+  gap: var(--espacio-2);
+}
+
+/* Línea de progreso del stepper, pegada al borde inferior de la barra */
+.panel-progreso {
+  position: absolute;
+  left: 0;
+  bottom: -1px;
+  height: 2px;
+  width: 14.28%;                   /* 1 de 7 al abrir */
+  background: var(--acento-oscuro);
+  transition: width 0.4s var(--curva);
+}
+
+/* --- Menú del índice (se despliega desde la barra) --- */
+
+.panel-menu {
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  right: var(--margen-x);
+  width: min(20rem, calc(100vw - 2 * var(--margen-x)));
+  margin: 0;
+  padding: var(--espacio-2);
+  background: var(--color-fondo);
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio-medio);
+  box-shadow: var(--sombra-suave);
+  display: grid;
+  gap: 2px;
+  z-index: 7;
+}
+
+.panel-menu[hidden] { display: none; }
+
+.indice-enlace {
+  display: flex;
+  align-items: baseline;
+  gap: 0.9em;
+  padding: 0.55rem 0.85rem;
+  border-radius: var(--radio-chico);
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--color-texto);
+  text-decoration: none;
+  transition:
+    background-color var(--duracion) var(--curva),
+    color var(--duracion) var(--curva),
+    transform var(--duracion) var(--curva);
+}
+
+.indice-num {
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  color: var(--acento);
+}
+
+.indice-enlace:hover { background: var(--color-crema); }
+
+.indice-enlace.activo {
+  background: var(--tinte);
+  color: var(--acento-oscuro);
+  font-weight: 600;
+}
+
+
+/* ================= 6. Cabecera editorial y secciones ===================== */
+
+/* Cabecera del panel: etiqueta, título serif grande y bajada */
+.panel-cabecera {
+  padding: var(--espacio-6) var(--margen-x) var(--espacio-4);
+  background: var(--color-fondo);
+}
+
+.panel-tema {
+  margin: 0 0 var(--espacio-2);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--acento-oscuro);
+  opacity: 0.85;
+}
+
+.panel-titulo {
+  font-size: clamp(2.1rem, 4.5vw, 3.1rem);
+  font-weight: 700;
+  line-height: 1.05;
+  color: var(--acento-oscuro);
+  margin: 0 0 var(--espacio-3);
+}
+
+.panel-bajada {
+  max-width: 52ch;
+  color: var(--texto-suave-tema);
+  margin: 0;
+}
+
+/* Cuerpo: columna única de lectura con margen generoso */
+.panel-cuerpo {
+  position: relative;
+  width: min(42rem, 100%);
+  margin: 0 auto;
+  padding: var(--espacio-5) var(--margen-x) var(--espacio-6);
+}
+
+.seccion {
+  position: relative;
+  margin: 0 0 var(--espacio-6);
+  scroll-margin-top: 76px;          /* deja ver la barra fija al saltar */
+}
+
+.seccion:last-child { margin-bottom: 0; }
+
+/* La aparición de las secciones al abrir el panel y al desplazarse es
+   scroll reveal con IntersectionObserver: css/animaciones.css + js/
+   animaciones.js (data-reveal + stagger de 90 ms por lote). */
+
+/* Etiqueta de paso: "Paso 01" en microcopy */
+.seccion-numero {
+  margin: 0 0 var(--espacio-2);
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--acento);
+}
+
+/* Título de sección en serif editorial */
+.seccion-titulo {
+  font-size: clamp(1.65rem, 3.2vw, 2.15rem);
+  font-weight: 700;
+  color: var(--acento-oscuro);
+  margin: 0 0 var(--espacio-3);
+}
+
+/* Texto justificado (como en un documento de Word) en los párrafos
+   informativos; la separación en sílabas evita calles blancas. */
+.seccion-texto {
+  max-width: 64ch;
+  color: var(--texto-suave-tema);
+  text-align: justify;
+  hyphens: auto;
+}
+
+/* Decoración de la sección de introducción: parche de puntos */
+.seccion--intro .puntos {
+  width: 11rem;
+  height: 9rem;
+  right: -1rem;
+  top: -1.5rem;
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+
+/* --- Bloques de teoría --- */
+
+.bloque {
+  margin: 0 0 var(--espacio-4);
+  max-width: 64ch;
+}
+
+.bloque:last-child { margin-bottom: 0; }
+
+.bloque-subtitulo {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--acento-oscuro);
+  margin: 0 0 var(--espacio-1);
+}
+
+.bloque p {
+  color: var(--texto-suave-tema);
+  text-align: justify;
+  hyphens: auto;
+}
+
+/* Fórmulas: tarjeta crema con serif, estilo libro de texto. El selector
+   sube a .bloque .formula para ganarle a ".bloque p" (que justifica el
+   texto del bloque) y mantener la fórmula centrada en su tarjeta. */
+.bloque .formula {
+  margin: var(--espacio-2) 0;
+  padding: var(--espacio-3) var(--espacio-4);
+  background: var(--color-crema);
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio-medio);
+  font-family: var(--fuente-titulos);
+  font-size: 1.15rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  color: var(--acento-oscuro);
+  text-align: center;
+}
+
+.formula sub,
+.formula sup { font-size: 0.68em; }
+
+
+/* --- Video: cuadrado grande con miniatura y botón de reproducción --- */
+
+.video {
+  position: relative;
+  display: block;
+  width: min(100%, 26rem);
+  aspect-ratio: 1 / 1;
+  border-radius: var(--radio-grande);
+  overflow: hidden;
+  background: var(--tinte);
+  border: 1px solid var(--color-borde);
+  box-shadow: var(--sombra-suave);
+  transition:
+    transform var(--duracion) var(--curva),
+    box-shadow var(--duracion) var(--curva);
+}
+
+.video-miniatura {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Velo oscuro suave al pasar el cursor */
+.video::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--color-texto);
+  opacity: 0;
+  transition: opacity var(--duracion) var(--curva);
+}
+
+@media (hover: hover) {
+  .video:hover::after { opacity: 0.14; }
+}
+
+.video-play {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: 4.5rem;
+  height: 4.5rem;
+  border-radius: 50%;
+  background: var(--acento-oscuro);
+  display: grid;
+  place-items: center;
+  box-shadow: var(--sombra-suave);
+  transition: transform var(--duracion) var(--curva);
+  z-index: 1;
+}
+
+.video-play svg {
+  width: 1.6rem;
+  height: 1.6rem;
+  margin-left: 0.2rem;
+  fill: #ffffff;
+}
+
+@media (hover: hover) {
+  .video:hover .video-play { transform: scale(1.06); }
+}
+
+.video-datos {
+  margin-top: var(--espacio-2);
+  max-width: 26rem;
+  color: var(--texto-suave-tema);
+}
+
+.video-titulo { display: block; font-weight: 600; color: var(--color-texto); }
+
+.video-nota {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--texto-suave-tema);
+}
+
+/* Aviso cuando la miniatura no carga (sin conexión a internet) */
+.video-fallo {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  text-align: center;
+  padding: var(--espacio-3);
+  font-size: 0.85rem;
+  color: var(--acento-oscuro);
+}
+
+/* Estado del video mientras no se completa el ID */
+.video--pendiente {
+  display: grid;
+  place-content: center;
+  gap: var(--espacio-1);
+  text-align: center;
+  padding: var(--espacio-4);
+  border: 2px dashed var(--color-borde-fuerte);
+  background: transparent;
+  box-shadow: none;
+}
+
+.video--pendiente .video-pendiente-titulo {
+  margin: 0;
+  font-family: var(--fuente-titulos);
+  font-weight: 700;
+  color: var(--acento-oscuro);
+}
+
+.video--pendiente .video-pendiente-texto {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--acento-oscuro);
+}
+
+.video--pendiente .video-pendiente-ayuda {
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--texto-suave-tema);
+}
+
+
+/* --- Botón destacado de la presentación (CTA casi a todo lo ancho) --- */
+
+.boton-presentacion {
+  display: flex;
+  width: min(100%, 26rem);
+}
+
+.boton-presentacion svg { width: 1.1em; height: 1.1em; }
+
+/* Variante mientras el enlace no está completado */
+.boton-presentacion--pendiente {
+  background: transparent;
+  color: var(--color-texto-suave);
+  border: 2px dashed var(--color-borde-fuerte);
+}
+
+@media (hover: hover) {
+  .boton-presentacion--pendiente:hover {
+    background: transparent;
+    filter: none;
+    box-shadow: none;
+  }
+}
+
+.presentacion-nota {
+  margin-top: var(--espacio-2);
+  font-size: 0.85rem;
+  color: var(--texto-suave-tema);
+  max-width: 45ch;
+}
+
+.presentacion-nota p { margin: 0 0 var(--espacio-1); }
+
+/* Imagen cargada dentro del marco del banco de imágenes */
+.imagen-archivo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  border-radius: inherit;
+}
+
+/* Botón que abre el documento aparte con el prompt completo del video */
+.nota-prompt-boton {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45em;
+  padding: 0.45em 0.95em;
+  border: 1px solid var(--color-borde);
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--color-texto);
+  text-decoration: none;
+  transition:
+    border-color var(--duracion) var(--curva),
+    color var(--duracion) var(--curva),
+    background var(--duracion) var(--curva),
+    transform var(--duracion) var(--curva);
+}
+
+@media (hover: hover) {
+  .nota-prompt-boton:hover {
+    border-color: var(--acento);
+    color: var(--acento-oscuro);
+  }
+}
+
+.nota-prompt-boton:focus-visible { outline-color: var(--acento-oscuro); }
+
+.nota-prompt-boton svg {
+  width: 0.95em;
+  height: 0.95em;
+  fill: currentColor;
+  flex: none;
+}
+
+
+/* --- Tarjetas de juegos --- */
+
+.juegos-rejilla {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+  gap: var(--espacio-3);
+}
+
+.juego-tarjeta {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-1);
+  padding: var(--espacio-4);
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio-grande);
+  background: var(--color-fondo);
+  text-decoration: none;
+  color: var(--color-texto);
+  overflow: hidden;
+  transition:
+    border-color var(--duracion) var(--curva),
+    transform var(--duracion) var(--curva),
+    box-shadow var(--duracion) var(--curva);
+}
+
+@media (hover: hover) {
+  .juego-tarjeta:hover {
+    border-color: var(--acento);
+    transform: translateY(-3px) scale(1.02);
+    box-shadow: var(--sombra-suave);
+  }
+}
+
+.juego-tarjeta-numero {
+  font-size: 0.64rem;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--acento);
+}
+
+.juego-tarjeta-nombre {
+  font-family: var(--fuente-titulos);
+  font-size: 1.18rem;
+  font-weight: 700;
+  color: var(--acento-oscuro);
+}
+
+.juego-tarjeta-descripcion {
+  font-size: 0.85rem;
+  line-height: 1.65;
+  color: var(--texto-suave-tema);
+}
+
+.juego-tarjeta-accion {
+  margin-top: auto;
+  padding-top: var(--espacio-2);
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--acento-oscuro);
+}
+
+
+/* --- Cierre: tarjeta crema con decoración blob + puntos --- */
+
+.cierre {
+  position: relative;
+  overflow: hidden;
+  text-align: center;
+  background: var(--color-crema);
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio-grande);
+  padding: var(--espacio-6) var(--espacio-4);
+}
+
+.cierre-deco {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.cierre-deco .blob {
+  width: 12rem;
+  right: -4rem;
+  bottom: -5rem;
+  opacity: 0.16;
+}
+
+.cierre-deco .puntos {
+  width: 10rem;
+  height: 8rem;
+  left: 1.5rem;
+  top: 1.5rem;
+  opacity: 0.55;
+}
+
+.cierre > *:not(.cierre-deco) {
+  position: relative;
+  z-index: 1;
+}
+
+.cierre-gracias {
+  font-family: var(--fuente-titulos);
+  font-size: 1.9rem;
+  font-weight: 700;
+  color: var(--acento-oscuro);
+  margin: 0 0 var(--espacio-2);
+}
+
+.cierre-texto {
+  max-width: 48ch;
+  margin-inline: auto;
+  color: var(--texto-suave-tema);
+  text-align: justify;
+  hyphens: auto;
+}
+
+.cierre-integrantes {
+  list-style: none;
+  margin: var(--espacio-3) 0 var(--espacio-1);
+  padding: 0;
+  font-weight: 600;
+  color: var(--color-texto);
+}
+
+.cierre-meta {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--texto-suave-tema);
+}
+
+.cierre-fecha {
+  margin: var(--espacio-1) 0 0;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--texto-suave-tema);
+}
+
+/* --- Nota de producción plegable: prompt completo del video --- */
+
+.presentacion-nota--prompt {
+  max-width: none;
+}
+
+.presentacion-nota--prompt summary {
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.prompt-texto {
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+  font-size: 0.78rem;
+  line-height: 1.65;
+  max-width: 78ch;
+  margin-top: var(--espacio-2);
+}

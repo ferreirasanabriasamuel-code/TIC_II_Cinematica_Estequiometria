@@ -1,0 +1,227 @@
+/* ============================================================================
+   animaciones.css — Capa de movimiento "premium" del sitio
+   ----------------------------------------------------------------------------
+   NO define colores ni tipografía: solo movimiento. Se carga DESPUÉS de los
+   demás CSS (y de modo-oscuro.css) en todas las páginas. La lógica vive en
+   js/animaciones.js (IntersectionObserver, scroll del encabezado, carga de
+   imágenes) y js/plasma-wave-react.js (la onda de luz del fondo).
+
+   Contiene:
+     1. Scroll reveal (fade-in + subida) con stagger por lotes
+     2. Encabezados: blur + sombra al superar ~50 px de scroll
+     3. Fondo animado de la portada (PlasmaWave) y superficies translúcidas
+     4. Estados hover (escala sutil) y active (escala hacia abajo)
+     5. Carga de imágenes: fade + desenfoque (blur-up)
+     6. Respeto por prefers-reduced-motion
+
+   Reglas de rendimiento: solo se animan transform y opacity (y box-shadow /
+   backdrop-filter en los encabezados, que no provocan reflow).
+   ========================================================================== */
+
+
+/* ======================= 1. Scroll reveal ================================= */
+/* Los elementos con data-reveal entran con fade + translateY(18px) cuando
+   aparecen en el viewport (IntersectionObserver). El retardo escalonado de
+   los grupos (cards de una rejilla) lo asigna JS por lote mediante la
+   variable --reveal-delay. Los atributos se retiran al terminar la
+   transición para que los estados hover recuperen el control del transform. */
+
+html.animaciones-activas [data-reveal] {
+  opacity: 0;
+  transform: translateY(18px);
+  transition:
+    opacity 0.6s var(--curva),
+    transform 0.6s var(--curva);
+  transition-delay: var(--reveal-delay, 0ms);
+}
+
+html.animaciones-activas [data-reveal].reveal-visible {
+  opacity: 1;
+  transform: none;
+}
+
+
+/* ============== 2. Encabezados: blur + sombra al hacer scroll ============ */
+/* En reposo los encabezados se ven exactamente como siempre; al superar
+   ~50 px de scroll, js/animaciones.js agrega la clase --desplazada y el
+   encabezado adquiere backdrop-filter: blur(10px) y una sombra ligera.     */
+
+/* Masthead de la portada: pasa a fijo (sticky) para comportarse como
+   barra de navegación cuando la página se desplaza (móvil). */
+.portada-cabecera {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  background: rgba(255, 255, 255, 0.9);
+  transition:
+    background-color var(--duracion) var(--curva),
+    box-shadow var(--duracion) var(--curva);
+}
+
+/* En móvil el panel va en el flujo (position: static) pero es flex item:
+   con z-index 10 queda por encima del masthead (z 5) cuando el usuario
+   entra a leer, igual que en escritorio (allí el panel ya es fixed z 10).
+   Sin esto, el contexto de apilamiento que le crea su animación de
+   apertura lo dejaría debajo del masthead pegado. */
+@media (max-width: 959px) {
+  .panel { z-index: 10; }
+}
+
+.portada-cabecera--desplazada {
+  background: rgba(255, 255, 255, 0.72);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 10px 30px rgba(38, 35, 46, 0.08);
+}
+
+/* Barra del panel y barra de juego: en reposo sin blur (nada pasa por
+   debajo), al hacer scroll ganan blur + sombra. */
+.panel-barra,
+.juego-cabecera {
+  transition:
+    box-shadow var(--duracion) var(--curva),
+    background-color var(--duracion) var(--curva);
+}
+
+.panel-barra--desplazada,
+.juego-cabecera--desplazada {
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 10px 30px rgba(38, 35, 46, 0.08);
+}
+
+
+/* ================= 3. Fondo animado de la portada ========================= */
+/* La onda PlasmaWave (WebGL2, js/plasma-wave-react.js) queda fija detrás
+   de todo el contenido de la portada; las superficies de la portada se
+   vuelven levemente translúcidas para que la onda respire detrás (en modo
+   claro, apenas; el modo oscuro define su propia translucidez en
+   modo-oscuro.css). No captura eventos: el cursor se escucha en window.  */
+
+#fondo-portada {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* El contenido de la portada pinta por encima de la onda por orden del
+   árbol (el ancla #fondo-portada va primero dentro de .portada). Sin
+   z-index aquí: así los paneles (z 10, dentro de .portada-lienzo) compiten
+   directamente con el masthead (z 5) en la misma capa, como siempre. El
+   canvas (.plasma-wave-canvas) se dimensiona en css/plasma-wave.css.    */
+
+/* Superficies translúcidas: la onda se adivina detrás, sin molestar */
+.mitad {
+  background: rgba(255, 255, 255, 0.9);
+}
+
+/* Con un panel abierto la onda se tapa: js/animaciones.js la pausa para
+   no gastar batería (portada--con-panel). Nada que estilizar aquí.       */
+
+
+/* ===================== 4. Hover con escala + active ======================= */
+/* Complementa los hovers existentes (que ya movían sombra/borde) con una
+   escala sutil, y agrega el scale-down breve al pulsar. Solo transform:
+   nada de reflow.                                                          */
+
+@media (hover: hover) {
+  /* Botones cuadrados de trazo fino e interruptor de modo */
+  .panel-boton:hover,
+  .interruptor-modo:hover,
+  .dialogo-cerrar:hover { transform: scale(1.05); }
+
+  /* Enlaces y botones de texto */
+  .juego-volver:hover,
+  .juego-menu:hover { transform: scale(1.03); }
+
+  .nota-prompt-boton:hover { transform: scale(1.03); }
+
+  .indice-enlace:hover { transform: translateX(3px); }
+
+  /* Enlaces-card del banco de video: escala mínima, respeta su velo */
+  .video:hover { transform: scale(1.015); }
+
+  /* Botones de los motores de juego */
+  .clasificar-chip:hover { transform: scale(1.04); }
+
+  .adivina-tecla:hover:not(:disabled) { transform: scale(1.05); }
+
+  .completar-hueco:hover:not(:disabled) { transform: scale(1.02); }
+}
+
+/* Al pulsar: scale-down breve (más rápido que el hover, feedback directo) */
+.boton-primario:active,
+.mitad:active .mitad-boton,
+.acercade-tarjeta:active {
+  transform: scale(0.97);
+  transition-duration: 0.15s;
+}
+
+.juego-tarjeta:active,
+.video:active {
+  transform: scale(0.98);
+  transition-duration: 0.15s;
+}
+
+.video:active .video-play { transform: scale(0.97); }
+
+.panel-boton:active,
+.interruptor-modo:active,
+.dialogo-cerrar:active,
+.juego-volver:active,
+.juego-menu:active,
+.nota-prompt-boton:active,
+.clasificar-chip:active,
+.adivina-tecla:active:not(:disabled),
+.completar-hueco:active:not(:disabled) {
+  transform: scale(0.97);
+  transition-duration: 0.15s;
+}
+
+
+/* ================= 5. Carga de imágenes (blur-up) ========================= */
+/* js/animaciones.js agrega .imagen-fade a cada imagen y cambia a
+   .imagen-cargada cuando termina de cargar: fade + desenfoque que se
+   disuelve, en lugar de una aparición seca. Si el JS no corre, las
+   imágenes se ven normales.                                                */
+
+html.animaciones-activas img.imagen-fade {
+  opacity: 0;
+  filter: blur(14px);
+  transform: scale(1.03);
+  transition:
+    opacity 0.6s var(--curva),
+    filter 0.6s var(--curva),
+    transform 0.6s var(--curva);
+}
+
+html.animaciones-activas img.imagen-fade.imagen-cargada {
+  opacity: 1;
+  filter: blur(0);
+  transform: none;
+}
+
+
+/* =================== 6. Movimiento reducido =============================== */
+
+@media (prefers-reduced-motion: reduce) {
+  html.animaciones-activas [data-reveal] {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+
+  html.animaciones-activas img.imagen-fade {
+    opacity: 1;
+    filter: none;
+    transform: none;
+    transition: none;
+  }
+
+  .portada-cabecera,
+  .panel-barra,
+  .juego-cabecera {
+    transition: none;
+  }
+}
