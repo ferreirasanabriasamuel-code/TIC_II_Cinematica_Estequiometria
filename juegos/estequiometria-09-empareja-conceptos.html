@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Empareja los conceptos — Estequiometría · Trabajo práctico</title>
+  <meta name="description" content="Unir cada concepto de estequiometría con su definición.">
+  <!-- Modo claro/oscuro: aplica la preferencia guardada ANTES del primer
+       render (localStorage 'tp-ciencias-modo'; sin preferencia, la del
+       sistema). El interruptor vive en la barra superior de la página. -->
+  <script>
+    (function () {
+      try {
+        var modo = window.localStorage.getItem('tp-ciencias-modo');
+        if (!modo) {
+          modo = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+            ? 'oscuro' : 'claro';
+        }
+        if (modo === 'oscuro') document.documentElement.setAttribute('data-modo', 'oscuro');
+      } catch (e) { /* sin almacenamiento: se queda en modo claro */ }
+    })();
+  </script>
+
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='16' height='32' fill='%230891b2'/%3E%3Crect x='16' width='16' height='32' fill='%237c3aed'/%3E%3C/svg%3E">
+
+  <link rel="stylesheet" href="../css/base.css">
+  <link rel="stylesheet" href="../css/juego.css">
+  <link rel="stylesheet" href="../css/extras.css">
+  <link rel="stylesheet" href="../css/modo-oscuro.css">
+  <link rel="stylesheet" href="../css/animaciones.css">
+</head>
+
+<body class="pagina-juego tema-estequiometria">
+
+  <!-- Decoración editorial fija: blob orgánico + patrón de puntos -->
+  <div class="deco-pagina" aria-hidden="true"><span class="puntos"></span><span class="blob"></span></div>
+
+  <!-- Barra superior: volver al tema, etiqueta del juego e interruptor de modo -->
+  <header class="juego-cabecera">
+    <a class="juego-volver" href="../index.html#estequiometria">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M11 18l-6-6 6-6"/></svg>
+      <span class="juego-volver-texto">Volver a Estequiometría</span>
+    </a>
+    <p class="juego-tema">Estequiometría · Juego 9 de 10</p>
+    <div class="juego-cabecera-acciones">
+      <a class="juego-menu" href="../index.html#estequiometria-juegos" aria-label="Ver todos los juegos de Estequiometría"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/></svg></a>
+      <button class="interruptor-modo" type="button" aria-pressed="false"
+                      aria-label="Activar el modo oscuro">
+                <svg viewBox="0 0 24 24" class="icono-luna" aria-hidden="true"><path d="M20 13.6A8 8 0 1 1 10.4 4a6.6 6.6 0 0 0 9.6 9.6z"/></svg>
+                <svg viewBox="0 0 24 24" class="icono-sol" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.6M12 18.9v2.6M2.5 12h2.6M18.9 12h2.6M5 5l1.9 1.9M17.1 17.1L19 19M19 5l-1.9 1.9M6.9 17.1L5 19"/></svg>
+              </button>
+    </div>
+  </header>
+
+  <main class="juego-principal">
+    <h1 class="juego-titulo">Empareja los conceptos</h1>
+    <div class="juego-subrayado" aria-hidden="true"></div>
+    <p class="juego-descripcion">Unir cada concepto de estequiometría con su definición.</p>
+
+    <!-- El motor de juegos construye la interfaz dentro de esta zona -->
+    <div class="juego-zona" id="juego-zona"></div>
+
+    <a class="juego-volver juego-volver-final" href="../index.html#estequiometria">
+      Volver a Estequiometría
+    </a>
+  </main>
+
+  <!-- Modo claro/oscuro + motor compartido + datos propios de este juego -->
+  <script src="../js/modo.js"></script>
+  <script src="../js/motor-juegos.js"></script>
+  <script src="estequiometria-09-empareja-conceptos.js"></script>
+  <script defer src="../js/animaciones.js"></script>
+
+</body>
+</html>
