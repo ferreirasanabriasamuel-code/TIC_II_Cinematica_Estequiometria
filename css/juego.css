@@ -428,9 +428,10 @@
 .juego-acciones { margin-top: var(--espacio-3); }
 
 .juego-boton {
-  display: inline-flex;
+  display: flex;
   align-items: center;
   justify-content: center;
+  margin-inline: auto;
   width: min(100%, 24rem);
   min-height: 3.1rem;
   padding: 0.8rem 1.8rem;
