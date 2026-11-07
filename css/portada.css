@@ -81,6 +81,13 @@
     gap: var(--espacio-1);
   }
 
+  /* El renglón de integrantes ocupa todo el ancho: nombres a la izquierda
+     e interruptor claro/oscuro pegado al borde derecho de la pantalla. */
+  .portada-cabecera-derecha {
+    width: 100%;
+    justify-content: space-between;
+  }
+
   .portada-autores { text-align: left; }
 }
 
