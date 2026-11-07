@@ -1,0 +1,8 @@
+# Archivos del sistema operativo que no deben subirse al repositorio
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Copias de respaldo de editores
+*~
+*.bak

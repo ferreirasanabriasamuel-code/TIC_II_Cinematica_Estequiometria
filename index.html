@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Cinemática y Estequiometría — Trabajo práctico · Tercer Curso · Turno Tarde</title>
+  <meta name="description"
+        content="Trabajo final de TIC II: página web académica e interactiva para estudiar y exponer Cinemática y Estequiometría — teoría, material de lectura, video, banco de imágenes, 20 actividades y autoevaluación.">
+
+  <!-- Modo claro/oscuro: aplica la preferencia guardada ANTES del primer
+       render para evitar un destello de tema equivocado. Guardado en
+       localStorage ('tp-ciencias-modo'); si no hay preferencia, se usa la
+       del sistema (prefers-color-scheme). -->
+  <script>
+    (function () {
+      try {
+        var modo = window.localStorage.getItem('tp-ciencias-modo');
+        if (!modo) {
+          modo = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+            ? 'oscuro' : 'claro';
+        }
+        if (modo === 'oscuro') document.documentElement.setAttribute('data-modo', 'oscuro');
+      } catch (e) { /* sin almacenamiento: se queda en modo claro */ }
+    })();
+  </script>
+
+  <!-- Ícono de la pestaña: mitad cian, mitad violeta (inline, sin archivos) -->
+  <link rel="icon"
+        href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='16' height='32' fill='%230891b2'/%3E%3Crect x='16' width='16' height='32' fill='%237c3aed'/%3E%3C/svg%3E">
+
+  <!-- El sufijo ?v=4 obliga al navegador a pedir la última versión de cada
+       archivo propio (css/ y js/) en cada visita tras una actualización:
+       sin él, una copia vieja en caché puede mostrar textos desactualizados
+       mezclados con cambios nuevos. Al publicar una corrección, suba el
+       número (v4, v5…). -->
+  <link rel="stylesheet" href="css/base.css?v=4">
+  <link rel="stylesheet" href="css/portada.css?v=4">
+  <link rel="stylesheet" href="css/acerca.css?v=4">
+  <link rel="stylesheet" href="css/extras.css?v=4">
+  <link rel="stylesheet" href="css/accordion-gallery.css?v=4">
+  <link rel="stylesheet" href="css/plasma-wave.css?v=4">
+  <link rel="stylesheet" href="css/glass-surface.css?v=4">
+  <link rel="stylesheet" href="css/modo-oscuro.css?v=4">
+  <!-- Capa de movimiento (reveal, encabezados al scroll, fondos animados):
+       se carga al final para que no altere el estilo base -->
+  <link rel="stylesheet" href="css/animaciones.css?v=4">
+
+  <!-- datos.js define TODO el contenido; principal.js construye la página;
+       modo.js maneja el interruptor de modo claro/oscuro (carga antes que
+       principal.js para que los interruptores de los paneles se refresquen);
+       React 18 (vendido en js/react/) + plasma-wave-react.js montan el
+       fondo animado de la portada como componente React (la onda de luz
+       PlasmaWave de react-bits, dibujada con WebGL2), glass-surface-react.js
+       envuelve en vidrio los botones y la píldora "Sobre este proyecto"
+       (GlassSurface de react-bits), y gsap.min.js (vendido) +
+       accordion-gallery-react.js montan la galería acordeón del banco de
+       imágenes; animaciones.js orquesta el scroll reveal, los encabezados y
+       la carga de imágenes -->
+  <script defer src="js/datos.js?v=4"></script>
+  <script defer src="js/modo.js?v=4"></script>
+  <script defer src="js/principal.js?v=4"></script>
+  <script defer src="js/react/react.production.min.js"></script>
+  <script defer src="js/react/react-dom.production.min.js"></script>
+  <script defer src="js/gsap.min.js"></script>
+  <script defer src="js/accordion-gallery-react.js?v=4"></script>
+  <script defer src="js/plasma-wave-react.js?v=4"></script>
+  <script defer src="js/glass-surface-react.js?v=4"></script>
+  <script defer src="js/animaciones.js?v=4"></script>
+</head>
+
+<body>
+
+  <!--
+    PORTADA: pantalla completa dividida en dos mitades, estilo editorial.
+    Los textos con "…" los completa js/principal.js con los datos de
+    js/datos.js; este archivo casi no necesita editarse. La card flotante
+    "Sobre este proyecto" y su diálogo también las agrega principal.js.
+  -->
+  <main class="portada" id="portada">
+
+    <!-- Masthead superior: marca de la página + integrantes y curso +
+         interruptor de modo claro/oscuro (arriba a la derecha) -->
+    <header class="portada-cabecera">
+      <p class="portada-marca">Física y Química · TIC II</p>
+      <div class="portada-cabecera-derecha">
+        <p class="portada-autores" id="portada-autores">…</p>
+        <button class="interruptor-modo" type="button" aria-pressed="false"
+                aria-label="Activar el modo oscuro">
+          <svg viewBox="0 0 24 24" class="icono-luna" aria-hidden="true"><path d="M20 13.6A8 8 0 1 1 10.4 4a6.6 6.6 0 0 0 9.6 9.6z"/></svg>
+          <svg viewBox="0 0 24 24" class="icono-sol" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.6M12 18.9v2.6M2.5 12h2.6M18.9 12h2.6M5 5l1.9 1.9M17.1 17.1L19 19M19 5l-1.9 1.9M6.9 17.1L5 19"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- Lienzo con las dos mitades. Los paneles viven intercalados para
+         que en celular cada tema se despliegue debajo de su mitad. -->
+    <div class="portada-lienzo">
+
+      <!-- Mitad izquierda: CINEMÁTICA (elemento activable con teclado) -->
+      <section class="mitad mitad--cinematica tema-cinematica"
+               id="mitad-cinematica"
+               role="button" tabindex="0"
+               data-tema="cinematica"
+               aria-expanded="false"
+               aria-controls="panel-cinematica">
+        <div class="mitad-deco" aria-hidden="true">
+          <span class="puntos"></span>
+          <span class="blob"></span>
+        </div>
+        <div class="mitad-contenido">
+          <p class="mitad-etiqueta">Tema 01 · Física</p>
+          <h1 class="mitad-titulo">Cinemática</h1>
+          <p class="mitad-bajada" id="bajada-cinematica">…</p>
+          <span class="mitad-boton">
+            Elegir tema
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                 aria-hidden="true">
+              <path d="M5 12h14M13 6l6 6-6 6"/>
+            </svg>
+          </span>
+        </div>
+      </section>
+
+      <!-- Panel de Cinemática (contenido renderizado por js/principal.js) -->
+      <section class="panel panel--cinematica tema-cinematica"
+               id="panel-cinematica"
+               aria-label="Contenido del tema Cinemática"
+               hidden></section>
+
+      <!-- Línea vertical fina que une los dos temas (elemento gráfico) -->
+      <div class="linea-central" aria-hidden="true"></div>
+
+      <!-- Mitad derecha: ESTEQUIOMETRÍA -->
+      <section class="mitad mitad--estequiometria tema-estequiometria"
+               id="mitad-estequiometria"
+               role="button" tabindex="0"
+               data-tema="estequiometria"
+               aria-expanded="false"
+               aria-controls="panel-estequiometria">
+        <div class="mitad-deco" aria-hidden="true">
+          <span class="puntos"></span>
+          <span class="blob"></span>
+        </div>
+        <div class="mitad-contenido">
+          <p class="mitad-etiqueta">Tema 02 · Química</p>
+          <h1 class="mitad-titulo">Estequiometría</h1>
+          <p class="mitad-bajada" id="bajada-estequiometria">…</p>
+          <span class="mitad-boton">
+            Elegir tema
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                 aria-hidden="true">
+              <path d="M5 12h14M13 6l6 6-6 6"/>
+            </svg>
+          </span>
+        </div>
+      </section>
+
+      <!-- Panel de Estequiometría (contenido renderizado por js/principal.js) -->
+      <section class="panel panel--estequiometria tema-estequiometria"
+               id="panel-estequiometria"
+               aria-label="Contenido del tema Estequiometría"
+               hidden></section>
+
+    </div>
+  </main>
+
+</body>
+</html>

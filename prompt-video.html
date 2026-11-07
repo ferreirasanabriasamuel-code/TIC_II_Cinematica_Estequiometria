@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Prompt completo del video educativo · TP Cinemática y Estequiometría</title>
+  <meta name="description" content="Documento aparte con el prompt completo y ordenado con el que el equipo generó la animación HTML del video educativo.">
+
+  <!-- Mismo modo claro/oscuro que el sitio (misma clave de localStorage) -->
+  <script>
+    (function () {
+      try {
+        var modo = window.localStorage.getItem('tp-ciencias-modo');
+        if (!modo) {
+          modo = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+            ? 'oscuro' : 'claro';
+        }
+        if (modo === 'oscuro') document.documentElement.setAttribute('data-modo', 'oscuro');
+      } catch (e) { /* sin almacenamiento: modo claro */ }
+    })();
+  </script>
+
+  <link rel="icon"
+        href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='16' height='32' fill='%230891b2'/%3E%3Crect x='16' width='16' height='32' fill='%237c3aed'/%3E%3C/svg%3E">
+
+  <style>
+    :root {
+      --fondo: #ffffff;
+      --texto: #050608;
+      --suave: #4b5563;
+      --borde: #e5e7eb;
+      --panel: #f7f7f8;
+      --codigo: #f0f0f1;
+      --acento: #0891b2;
+      --acento-suave: #ecfeff;
+    }
+    html[data-modo="oscuro"] {
+      --fondo: #0b0c0e;
+      --texto: #f3f4f6;
+      --suave: #9ca3af;
+      --borde: #26272b;
+      --panel: #141518;
+      --codigo: #1b1c20;
+      --acento: #22d3ee;
+      --acento-suave: #083344;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--fondo);
+      color: var(--texto);
+      font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+    .hoja { max-width: 52rem; margin: 0 auto; padding: 2.5rem 1.25rem 5rem; }
+
+    .doc-kicker {
+      font-size: .75rem; font-weight: 600; letter-spacing: .25em;
+      text-transform: uppercase; color: var(--acento); margin: 0 0 .5rem;
+    }
+    h1 { font-size: clamp(1.6rem, 4vw, 2.2rem); letter-spacing: -.02em; line-height: 1.15; margin: 0 0 .75rem; }
+    .doc-intro { color: var(--suave); max-width: 60ch; margin: 0 0 2rem; }
+
+    .doc-volver {
+      display: inline-block; margin-bottom: 2rem; font-size: .875rem; font-weight: 600;
+      color: var(--acento); text-decoration: none; border: 1px solid var(--borde);
+      border-radius: 999px; padding: .4rem .9rem; transition: border-color .2s;
+    }
+    .doc-volver:hover { border-color: var(--acento); }
+
+    h2 {
+      font-size: 1.15rem; letter-spacing: -.01em; margin: 2.5rem 0 .75rem;
+      padding-top: 1.25rem; border-top: 1px solid var(--borde);
+    }
+    h2 .num { color: var(--acento); font-variant-numeric: tabular-nums; margin-right: .5rem; }
+    h3 { font-size: .95rem; margin: 1.5rem 0 .5rem; }
+
+    ul, ol { margin: .5rem 0; padding-left: 1.4rem; }
+    li { margin: .3rem 0; }
+    strong { font-weight: 700; }
+
+    pre {
+      background: var(--codigo); border: 1px solid var(--borde); border-radius: .6rem;
+      padding: .9rem 1rem; overflow-x: auto; font-size: .8rem; line-height: 1.55;
+      font-family: ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, monospace;
+    }
+    code.inline {
+      background: var(--codigo); border-radius: .3rem; padding: .1em .4em;
+      font-size: .85em;
+      font-family: ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, monospace;
+    }
+
+    .doc-nota {
+      background: var(--acento-suave); border-left: 3px solid var(--acento);
+      border-radius: 0 .5rem .5rem 0; padding: .75rem 1rem; margin: 1rem 0;
+      font-size: .9rem;
+    }
+  </style>
+</head>
+<body>
+  <main class="hoja">
+
+    <a class="doc-volver" href="index.html">&larr; Volver a la página principal</a>
+
+    <p class="doc-kicker">Documento aparte · Paso 04</p>
+    <h1>Prompt completo del video educativo «Minimalist»</h1>
+    <p class="doc-intro">
+      Este documento reúne, de manera completa y ordenada, el prompt utilizado por el equipo
+      para generar la animación HTML del video educativo. El flujo de trabajo se organiza en
+      tres etapas: generación de un HTML autocontenido, creación de la narración con
+      ElevenLabs y exportación final en formato MP4. Se conserva en un documento separado de
+      la página principal para no sobrecargar el panel del Paso 04.
+    </p>
+
+    <div class="doc-nota">
+      <strong>Resumen en una línea:</strong> flujo de trabajo en tres etapas para la producción
+      de un video educativo de aproximadamente dos minutos: generación de un HTML
+      autocontenido, creación de la narración con ElevenLabs y exportación final en MP4.
+      Diseño monocromático, composición centrada y escalado fluido basado en unidades
+      <code class="inline">cqw</code>.
+    </div>
+
+    <h2><span class="num">1</span>🎨 Sistema de diseño (fijo, no cambia entre videos)</h2>
+    <ul>
+      <li><strong>Paleta estricta:</strong> fondo <code class="inline">#FFFFFF</code> · tinta
+          <code class="inline">#050608</code> · cuerpo <code class="inline">#242526</code> · gris medio
+          <code class="inline">#B1B1B2</code> · grises de apoyo
+          <code class="inline">#E8E8E8 / #F0F0F0 / #F7F7F7</code> · puntos
+          <code class="inline">#757677</code>. Ningún otro color.</li>
+      <li><strong>Tipografía:</strong> Inter (400/500/700, Google Fonts). Títulos bold, tracking
+          levemente negativo, line-height ~1.05. Cuerpo regular 1.45–1.5.</li>
+      <li><strong>Visual:</strong> blobs orgánicos asimétricos (2–3 por escena máx.) · matrices de
+          puntos (radial-gradient de 1.5px cada 18px) · cierre tipo CTA en píldora negra ·
+          whitespace generoso.</li>
+      <li><strong>Movimiento ambiente:</strong> los blobs flotan, respiran y rotan sutilmente y las
+          grillas de puntos derivan y laten, siempre lejos de los textos. Prohibido mover el
+          contenido (títulos, textos y diagramas) fuera de sus reveals: nada de dolly/zoom de cámara
+          ni <code class="inline">transform</code> en <code class="inline">.scene</code>. Todo función
+          pura de <code class="inline">t</code> dentro de <code class="inline">render(t)</code>
+          (nada de CSS <code class="inline">@keyframes</code>/transitions).</li>
+    </ul>
+
+    <h2><span class="num">2</span>📐 Reglas de composición y escalado</h2>
+    <ul>
+      <li><strong>Escenario</strong> (<code class="inline">.stage</code>):
+          <code class="inline">container-type: inline-size</code> &rarr; las unidades
+          <code class="inline">cqw</code> escalan con el tamaño real del video.</li>
+      <li><strong>Cada escena:</strong> flex-column centrada (horizontal y vertical),
+          <code class="inline">text-align: center</code>, gap 1.6–2cqw entre bloques.</li>
+      <li><strong>Dos plantillas de escena</strong>, alternadas para dar ritmo:
+          <em>CONCEPTO</em> (definiciones/ideas), protagonista el título: kicker &rarr; título
+          (4.8–5.6cqw, hasta 6cqw sin diagrama) &rarr; diagrama de apoyo (45–48% alto) &rarr; texto
+          de 1–2 líneas. <em>EJEMPLO</em> (procesos/casos), protagonista el diagrama: kicker &rarr;
+          diagrama (48–52% alto) &rarr; título &rarr; texto de 1 línea.</li>
+      <li><strong>Tamaños tipográficos</strong> (cqw, sobre referencia de 1280px): portada (h1) 8–9 ·
+          byline 1.2–1.4 · título de escena (h2) 4.8–5.6 (máx. 6cqw) · texto de apoyo (p) 2.6–3,
+          máx. ~30em, máx. 2 líneas (60–100 caracteres) · kicker/paso 1.4–1.6, mayúsculas,
+          tracking 0.25–0.3em · cierre 7–8 · piso mínimo 2.2 (no aplica a kicker/byline).</li>
+      <li><strong>Diagramas SVG:</strong> viewBox fijo ~2:1 (ej.
+          <code class="inline">0 0 640 320</code>), escalado con
+          <code class="inline">width:min(90%,720px)</code>. Ocupan 85–90% del ancho y 45–52% del
+          alto del escenario. Trazos de 1.5–2px (preferí 2px) y rótulos internos de 22–26px.
+          Nunca perdidos en una esquina: centrarlos o agregar elementos de apoyo.</li>
+      <li><strong>Regla anti-desborde (92%):</strong> kicker + título + diagrama + texto + gaps
+          &le; 92% del alto. Si se pasa, corregir en este orden: 1) acortar texto &rarr; 2) bajar
+          diagrama a 45% &rarr; 3) reducir título (nunca por debajo de 4.8cqw).</li>
+      <li><strong>Flechas:</strong> la punta siempre se calcula sobre el eje de la línea (nunca a
+          mano): û=(B−A)/|B−A| &rarr; n̂ perpendicular &rarr; base C=B−Lc·û &rarr; vértices C±h·n̂
+          &rarr; la línea termina en C.</li>
+      <li><strong>Separación decoración↔texto:</strong> margen &ge; 20px, medido con cajas de línea
+          reales (Range API + <code class="inline">getClientRects</code>), no con el bloque
+          contenedor.</li>
+      <li><strong>Guard NaN:</strong> en <code class="inline">ambient()</code>, si rAmp/pR son 0
+          &rarr; rotación = 0 (evita que <code class="inline">rotate(NaNdeg)</code> invalide todo el
+          transform).</li>
+    </ul>
+
+    <h2><span class="num">3</span>🧩 Estructura de escenas (6–9 escenas, ~120s totales)</h2>
+    <ul>
+      <li><strong>Portada:</strong> blob entrando desde un borde, título de 8–9cqw, byline debajo.</li>
+      <li><strong>Escenas intermedias:</strong> alternar tipo CONCEPTO / EJEMPLO según el contenido
+          (definición &rarr; conceptos clave &rarr; 2–3 ejemplos con su diagrama &rarr; aplicación
+          práctica).</li>
+      <li><strong>Cierre:</strong> síntesis de 1–2 líneas (7–8cqw) + CTA en píldora negra.</li>
+      <li><strong>Reloj comprimible:</strong> toda la línea de tiempo se define sobre 120s con un
+          factor de conversión (DUR, CLOCK=120/DUR), para poder re-cronometrar todo el video
+          cambiando un solo número cuando llega el audio real. El SRT se reescala igual.</li>
+    </ul>
+
+    <h2><span class="num">4</span>PASO 1. Generar el HTML (super prompt)</h2>
+    <p>Pedile a la IA una página HTML autocontenida (HTML+CSS+JS en un archivo) que sea un video de
+       ~120s sobre «[TEMA]», aplicando con exactitud el sistema de diseño de arriba. Puntos clave a
+       incluir en el prompt:</p>
+    <ul>
+      <li>Sin subtítulos en pantalla (van en un <code class="inline">.srt</code> aparte).</li>
+      <li>Todo el timing vía <code class="inline">requestAnimationFrame</code> en
+          <code class="inline">render(t)</code>, sin CSS animations con delays.</li>
+      <li>t=0 muestra la portada completa (sirve de póster).</li>
+      <li>Botón Play/Pause + barra de progreso (línea gris fina, cabezal negro, botón píldora).</li>
+      <li>Elemento <code class="inline">&lt;audio&gt;</code> listo para
+          <code class="inline">narracion.mp3</code>, sincronizado con
+          <code class="inline">audio.currentTime</code>.</li>
+      <li>Función global expuesta (ej. <code class="inline">window.&lt;nombre&gt;.render(t)</code>)
+          para capturar cuadro a cuadro después.</li>
+      <li>Transiciones entre escenas: crossfade de opacidad de 0.4–0.6s, sin escalar la escena
+          entrante.</li>
+      <li>Sin imágenes externas ni librerías pesadas (solo HTML/CSS/JS vanilla).</li>
+      <li><strong>Salidas:</strong> <code class="inline">video_[tema].html</code> (el video
+          completo, sin subtítulos) · <code class="inline">guion_[tema].md</code> (solo el texto
+          narrado, sin timestamps ni encabezados, español neutro, frases cortas, unas 300 a 320 palabras
+          para llenar 120s a ~155–160 ppm) · <code class="inline">subtitulos_[tema].srt</code>
+          (guion dividido en bloques de 1–2 líneas, máx. ~42 caracteres por línea, cronometrado por
+          escena; es una base de trabajo; se ajusta después sobre el audio real).</li>
+    </ul>
+
+    <h3>Código de referencia: CSS (composición + escalado)</h3>
+<pre>#wrap{position:fixed;inset:0}
+.stage{position:absolute;left:50%;top:50%;width:1280px;height:720px;background:var(--bg);transform-origin:center center;overflow:hidden;container-type:inline-size}
+.scene{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1.8cqw;text-align:center;padding:0 6cqw;opacity:0}
+.kicker{font-size:1.5cqw;letter-spacing:.28em;text-transform:uppercase;font-weight:600}
+.scene h2{font-size:5.2cqw;font-weight:700;letter-spacing:-.02em;line-height:1.1}
+.scene p{font-size:2.8cqw;line-height:1.48;max-width:30em}
+#s0 h1{font-size:8.5cqw;font-weight:700;letter-spacing:-.035em;line-height:1}
+.closing{font-size:7.5cqw;font-weight:700;line-height:1.08}
+.art svg{width:min(90%,720px);height:auto;display:block;margin:0 auto}</pre>
+
+    <h3>Código de referencia: JS (movimiento ambiente)</h3>
+<pre>var TAU = Math.PI * 2;
+function ambient(el, lt){ // data-env="ampX,ampY,pX,pY,sAmp,pS,rAmp,pR"
+  var p = el.getAttribute('data-env').split(',').map(Number);
+  var x = p[0]*Math.sin(TAU*lt/p[2] + 1.3),
+      y = p[1]*Math.sin(TAU*lt/p[3]),
+      s = 1 + p[4]*(0.5 + 0.5*Math.sin(TAU*lt/p[5] + 0.7)),
+      r = (p[6] && p[7]) ? p[6]*Math.sin(TAU*lt/p[7]) : 0; // guard NaN
+  el.style.transform = 'translate(' + x.toFixed(1) + 'px,' + y.toFixed(1) + 'px) rotate(' +
+                       r.toFixed(2) + 'deg) scale(' + s.toFixed(4) + ')';
+}
+function grid(el, lt){ // data-grid="t0,dur,driftPx,pDrift,opMin,pOp"
+  var p = el.getAttribute('data-grid').split(',').map(Number);
+  var dx = p[2]*Math.sin(TAU*lt/p[3]), dy = p[2]*0.6*Math.cos(TAU*lt/p[3]*0.8);
+  el.style.backgroundPosition = dx.toFixed(1) + 'px ' + dy.toFixed(1) + 'px';
+  el.style.opacity = (easeOut(norm(lt,p[0],p[0]+p[1])) *
+                      (p[4] + (1-p[4])*(0.5 + 0.5*Math.sin(TAU*lt/p[5])))).toFixed(3);
+}</pre>
+
+    <p><strong>Reglas duras:</strong> un elemento con <code class="inline">data-env</code> /
+       <code class="inline">data-grid</code> no usa <code class="inline">reveal()</code> /
+       <code class="inline">data-fade</code> · <code class="inline">.scene</code> jamás recibe
+       <code class="inline">transform</code> · <code class="inline">render(t)</code> debe ser
+       determinista.</p>
+
+    <h3>Checklist QA (antes de dar por bueno el HTML)</h3>
+    <ul>
+      <li><code class="inline">getComputedStyle(blob).transform &ne; none</code></li>
+      <li><code class="inline">backgroundPosition</code> de la grilla cambia entre dos tiempos</li>
+      <li><code class="inline">style.transform</code> de cada <code class="inline">.scene</code>
+          está vacío</li>
+      <li>Diff de 2 cuadros «quietos» por escena &rarr; 0 píxeles cambiando dentro de cajas de
+          texto o del SVG</li>
+      <li>Ninguna decoración interseca cajas de texto/SVG (margen &ge; 20px)</li>
+      <li>Suma vertical por escena &le; 92% del alto; rótulos SVG legibles</li>
+    </ul>
+
+    <h2><span class="num">5</span>PASO 2. Guion para narración (TTS, ej. ElevenLabs)</h2>
+    <ul>
+      <li><strong>Configuración de voz:</strong> española/latina neutra, educativa, cálida y clara ·
+          tono calmado, profesional, narrador de video educativo minimalista · ritmo
+          moderado-pausado (~115–120 ppm) con pausas naturales entre oraciones · estilo sin
+          dramatismo, sin efectos, vocalización clara.</li>
+      <li>Pegá el <code class="inline">guion_[tema].md</code> del Paso 1 tal cual, sin indicar
+          tiempos; alcanza con que la duración total se acerque a la del video.</li>
+    </ul>
+
+    <h2><span class="num">6</span>PASO 3. Armado final (video + audio)</h2>
+    <p><strong>División de trabajo:</strong> la IA arma el MP4 (renderiza el video silencioso y lo
+       muxea con tu audio) · vos hacés subtítulos y música de fondo en tu editor.</p>
+    <ol>
+      <li><strong>Video silencioso:</strong> pedí convertir el HTML a .mp4 silencioso, renderizando
+          cuadro por cuadro con su timing original.</li>
+      <li><strong>Audio:</strong> generás la narración en ElevenLabs con el guion y le pasás el
+          .mp3 a la IA.</li>
+      <li><strong>Entrega del MP4:</strong> al llegar el .mp3, la IA no vuelve a renderizar nada
+          (ni video, ni guion ni HTML), y solo muxea el audio tal cual contra el video silencioso
+          ya hecho. Sin recortes, normalización, fades, cambios de velocidad ni re-cronometrado.
+          Si la duración del mp3 difiere más del 5% de la del video, avisa antes de tocar algo.</li>
+      <li><strong>Montaje final (vos):</strong> importás el .mp4 en tu editor
+          (CapCut/Premiere/DaVinci), agregás subtítulos automáticos (siguen el audio real) y
+          música instrumental de fondo a volumen bajo, y exportás.</li>
+    </ol>
+
+    <h3>Receta técnica HTML &rarr; MP4</h3>
+    <p>Playwright (Chromium headless), viewport 1320×760, <code class="inline">deviceScaleFactor=1</code>,
+       clip del escenario en (20,20), tamaño 1280×720 · abrir con
+       <code class="inline">?clean</code> + <code class="inline">setControlsVisible(false)</code>
+       para ocultar controles · esperar <code class="inline">document.fonts.ready</code> y confirmar
+       Inter cargada (400/700) · por cuadro i en 0..DUR×30−1: <code class="inline">render(i/30)</code>
+       &rarr; screenshot PNG &rarr; <code class="inline">f%05d.png</code> · ffmpeg:</p>
+<pre>ffmpeg -nostdin -y -framerate 30 -i f%05d.png -c:v libx264 -preset fast -crf 18 \
+  -pix_fmt yuv420p -profile:v high -movflags +faststart out.mp4</pre>
+    <p>QA con ffprobe (duración y cantidad de cuadros correctos), diff de cuadros e inspección
+       visual de 1 captura por escena.</p>
+
+    <h3>Mux final (solo, sin re-render)</h3>
+<pre>ffmpeg -nostdin -y -i video_silencioso.mp4 -i narracion.mp3 \
+  -map 0:v:0 -map 1:a:0 -c:v copy -c:a aac -b:a 192k -af apad -t &lt;dur_video&gt; \
+  -movflags +faststart video_[tema].mp4</pre>
+
+    <h2><span class="num">7</span>📌 Notas clave</h2>
+    <ul>
+      <li>Sirve para cualquier tema de 1–2 min con la estructura: definición &rarr; conceptos
+          &rarr; ejemplos &rarr; aplicación &rarr; resumen.</li>
+      <li>El texto de apoyo corto + la regla del 92% son lo que mantiene el cuadro equilibrado: si
+          algo no entra, se acorta texto, nunca se achica la letra fuera de rango.</li>
+      <li>El audio de ElevenLabs se usa tal cual llega: el Paso 3 solo muxea, nunca re-procesa.</li>
+    </ul>
+
+  </main>
+</body>
+</html>
